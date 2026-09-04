@@ -1,0 +1,1 @@
+# 停用 Jekyll，讓 .well-known 這類以點開頭的目錄可以被 GitHub Pages 提供
