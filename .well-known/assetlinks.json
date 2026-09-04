@@ -1,0 +1,10 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.drsong0729.fangzhong",
+      "sha256_cert_fingerprints": ["4F:18:F2:2B:BD:05:AF:E1:5A:2C:E7:6D:7F:B4:6F:BE:38:FB:73:00:D9:B8:CA:BF:FB:2D:27:76:8A:ED:3F:A2"]
+    }
+  }
+]
