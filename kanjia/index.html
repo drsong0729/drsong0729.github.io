@@ -217,6 +217,34 @@ details.notice summary{cursor:pointer;font-weight:700;color:var(--navy)}
 .res-actions{display:flex;gap:10px;flex-wrap:wrap}
 .res-actions .btn{flex:1 1 140px}
 
+
+/* ---------- 333 售屋專案 ---------- */
+#scr-promo{overflow-y:auto;gap:12px;padding-bottom:18px;margin-right:-6px;padding-right:6px}
+.pr-pains{display:flex;flex-direction:column;gap:8px}
+.pr-pains p{margin:0;background:var(--navy-2);border:2px solid var(--mute);padding:9px 12px;font-size:16px;font-weight:900;line-height:1.45}
+.pr-pains p:nth-child(2){margin-left:14px}
+.pr-pains p:nth-child(3){margin-left:28px}
+.pr-hero{background:var(--gold);color:var(--ink);border:3px solid var(--ink);box-shadow:0 0 0 3px var(--paper),6px 6px 0 3px rgba(0,0,0,.45);padding:16px 14px;text-align:center;display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.pr-co{font-size:14px;font-weight:900;letter-spacing:.2em}
+.pr-333{font-family:var(--f-pix);font-size:44px;line-height:1.1;color:var(--red);text-shadow:3px 3px 0 var(--ink)}
+.pr-name{font-size:26px;font-weight:900;line-height:1.2;letter-spacing:.06em}
+.pr-x{font-size:16px;font-weight:900;border-top:3px solid var(--ink);border-bottom:3px solid var(--ink);padding:6px 0;margin-top:4px}
+.pr-sub{font-size:15px;font-weight:700}
+.pr-strip{background:var(--red);color:var(--paper);border:3px solid var(--ink);padding:10px 12px;font-size:16px;font-weight:900;text-align:center;line-height:1.45;text-wrap:balance}
+.pr-list{display:flex;flex-direction:column;gap:10px}
+.pr-item{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:start;background:var(--paper);color:var(--ink);border:3px solid var(--ink);box-shadow:4px 4px 0 rgba(0,0,0,.4);padding:10px 12px}
+.pr-item .n{width:44px;height:44px;display:grid;place-items:center;background:var(--navy);color:var(--gold);font-family:var(--f-pix);font-size:18px;border:3px solid var(--ink)}
+.pr-item h4{margin:0;font-size:17px;font-weight:900;line-height:1.35}
+.pr-item p{margin:3px 0 0;font-size:14.5px;line-height:1.55;color:#2c3650}
+.pr-gift{display:flex;gap:12px;align-items:center;background:var(--navy);border:3px solid var(--gold);box-shadow:0 0 0 3px var(--ink);padding:12px}
+.pr-gift canvas{width:52px;height:52px;flex:0 0 auto}
+.pr-gift div{font-size:16px;font-weight:900;line-height:1.5}
+.pr-gift b{color:var(--gold);font-size:19px}
+.pr-ask{display:flex;gap:10px;flex-wrap:wrap}
+.pr-ask a{flex:1 1 140px;text-align:center;text-decoration:none;font-weight:900;font-size:15px;padding:10px;border:3px solid var(--paper);color:var(--paper)}
+.pr-ask a.line{background:#06C755;border-color:var(--ink);color:#fff}
+#promo-next{margin-top:2px}
+
 @media (prefers-reduced-motion:reduce){.idle,.t-face .vs,.dialog .more{animation:none}.shake,.flash{animation:none}}
 @media (max-height:660px){.dialog .txt{font-size:16px}.opt{font-size:14.5px;padding:7px 10px}.arena{height:clamp(184px,31dvh,240px)}.dialog{min-height:74px}}
 </style>
@@ -303,6 +331,33 @@ details.notice summary{cursor:pointer;font-weight:700;color:var(--navy)}
       </div>
       <div class="next-row" id="next-row" hidden><button class="btn" id="next-btn" type="button">繼續 ▶</button></div>
     </div>
+  </section>
+
+
+  <!-- 333 售屋專案 -->
+  <section id="scr-promo" class="scr" hidden>
+    <div class="pr-pains">
+      <p>房貸壓力壓得你喘不過氣？</p>
+      <p>閒置的房子想出租又怕屋況變差？</p>
+      <p>想到要整理清潔就頭痛？</p>
+    </div>
+    <div class="pr-hero">
+      <div class="pr-co">日勝房屋</div>
+      <div class="pr-333">333</div>
+      <div class="pr-name">售屋專案</div>
+      <div class="pr-x">三大優勢 × 三季專任 × 三大好禮</div>
+      <div class="pr-sub">打造您的售屋致勝方程式</div>
+    </div>
+    <div class="pr-strip">專任委託 9 個月，開放全台跨品牌聯賣</div>
+    <div class="pr-list">
+      <div class="pr-item"><div class="n">1</div><div><h4>房貸／租金補助</h4><p>售屋期間依市場行情補貼利息或租金，降低售屋壓力。</p></div></div>
+      <div class="pr-item"><div class="n">2</div><div><h4>管理費補助</h4><p>委託期間提供每月管理費補助，讓您售屋期間更輕鬆。</p></div></div>
+      <div class="pr-item"><div class="n">3</div><div><h4>到府清潔</h4><p>每季提供一次專業到府清潔服務，打造最佳賣屋狀態，提高成交機會。</p></div></div>
+    </div>
+    <div class="pr-gift"><canvas id="gift-cv" class="px" aria-hidden="true"></canvas><div>成交後送<br><b>新馬四天三夜旅遊補助</b><br>最高 3 萬元</div></div>
+    <div class="pr-ask"><a href="tel:0975711267">打給 Ryan<br><span style="white-space:nowrap">0975-711-267</span></a><a class="line" href="https://line.me/ti/p/~dr.song0729" target="_blank" rel="noopener">加 LINE<br>dr.song0729</a></div>
+    <button class="btn" id="promo-next" type="button">看我的 21 天成績 ▶</button>
+    <div class="foot" style="text-align:center">日勝房屋 業務區長 吳松儒 Ryan</div>
   </section>
 
   <!-- RESULT -->
@@ -430,6 +485,9 @@ const SPR={
  lock:{pal:{D,G:'#A9851A',Y:'#F4CD3B',K:D},rows:[
   "................",".....DDDDDD.....","....DD....DD....","...DD......DD...","...D........D...","...D........D...","..DDDDDDDDDDDD..","..DYYYYYYYYYYD..",
   "..DYYYYKKYYYYD..","..DYYYYKKYYYYD..","..DYYYYYKYYYYD..","..DYYYYYKYYYYD..","..DGGGGGGGGGGD..","..DDDDDDDDDDDD..","................","................"]},
+ plane:{pal:{D,W:'#F7F0DC',B:'#4A7FD0',R:'#E5483B',Y:'#F4CD3B'},rows:[
+  "................","......DD........","......DBD.......","......DBBD......","..DD..DBBBD.....","..DRD.DBBBBD....","..DRRDDWWWWWDDD.",".DRRRRWWBWBWWWYD",
+  "..DDDDWWWWWWWWD.","......DBBBBDDD..","......DBBBD.....","......DBBD......","......DBD.......","......DD........","................","................"]},
  key:{pal:{D,Y:'#F4CD3B'},rows:[
   "................","................","...DDDD.........","..DYYYYD........",".DYYDDYYD.......",".DYD..DYDDDDDDD.",".DYD..DYYYYYYYYD",".DYYDDYYDDDYDYD.",
   "..DYYYYD..DYDYD.","...DDDD....D.D..","................","................","................","................","................","................"]}
@@ -1118,9 +1176,11 @@ function finish(reason){
     sold:['交屋完成！','房子終於賣掉了。你看著空蕩蕩的客廳，只想好好睡一覺。']};
   const [h,p]=msgs[reason];
   Snd.sfx(reason==='sold'?'fan':'lose');
-  overlay(`<div class="ov-k">DAY ${G.day} · ${reason==='sold'?'CLEAR':'GAME OVER'}</div><canvas id="ov-cv" class="px"></canvas><div class="ov-h">${h}</div><p class="ov-p">${p}</p>`,'看總成績',showResult);
+  overlay(`<div class="ov-k">DAY ${G.day} · ${reason==='sold'?'CLEAR':'GAME OVER'}</div><canvas id="ov-cv" class="px"></canvas><div class="ov-h">${h}</div><p class="ov-p">${p}</p>`,'繼續',showPromo);
   drawSprite($('#ov-cv'),reason==='sold'?SPR.house:SPR.meTired);
 }
+function showPromo(){Snd.play('title');show('scr-promo');$('#scr-promo').scrollTop=0;drawSprite($('#gift-cv'),SPR.plane);$('#promo-next').focus({preventScroll:true});}
+$('#promo-next').addEventListener('click',()=>{Snd.sfx('sel');showResult();});
 function computeResult(){
   const S=G.stats,sold=G.sold;const lossSum=G.losses.reduce((a,l)=>a+l.amt,0);
   let score=0;if(sold){score+=30+clamp((sold.pct-85)/15,0,1)*20;}
