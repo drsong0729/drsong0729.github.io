@@ -262,7 +262,7 @@ details.notice summary{cursor:pointer;font-weight:700;color:var(--navy)}
         <div class="vs">VS</div>
         <canvas id="t-boss" class="px idle" aria-hidden="true" style="animation-delay:.3s"></canvas>
       </div>
-      <p class="t-tag">不找仲介，自己賣房子。<br>白天上班、晚上帶看，稅務、法規、殺價魔王一關比一關難。<br>21 天，你撐得住嗎？</p>
+      <p class="t-tag">不找仲介，自己賣房子。<br>白天上班、晚上帶看，<br>稅務、法規、殺價魔王一關比一關難。<br>21 天，你撐得住嗎？</p>
     </div>
     <div class="t-bot">
       <button id="start-btn" class="btn" type="button">開始挑戰</button>
@@ -495,13 +495,19 @@ const SPR={
 function drawSprite(cv,s){cv.width=16;cv.height=16;const c=cv.getContext('2d');c.clearRect(0,0,16,16);
   s.rows.forEach((r,y)=>{for(let x=0;x<16;x++){const ch=r[x];if(ch&&ch!=='.'){c.fillStyle=s.pal[ch]||'#f0f';c.fillRect(x,y,1,1);}}});}
 function pixelText(cv,lines,size,fg,sh,scale){
-  const font=`900 ${size}px "Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif`;
+  // 以較細字重渲染後二值化，外加 1px 深色描邊與往下的陰影，避免筆畫糊在一起
+  const font=`700 ${size}px "Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif`;
   const t=document.createElement('canvas').getContext('2d');t.font=font;
-  const lh=size+4;const w=Math.ceil(Math.max(...lines.map(l=>t.measureText(l).width)))+4;const h=lh*lines.length+2;
+  const lh=Math.round(size*1.2);const w=Math.ceil(Math.max(...lines.map(l=>t.measureText(l).width)))+4;const h=lh*lines.length+2;
   t.canvas.width=w;t.canvas.height=h;t.font=font;t.textBaseline='top';t.fillStyle='#fff';t.textAlign='center';
   lines.forEach((l,i)=>t.fillText(l,w/2,1+i*lh));
-  const d=t.getImageData(0,0,w,h).data;cv.width=w+2;cv.height=h+2;const c=cv.getContext('2d');
-  [[sh,2],[fg,0]].forEach(([col,o])=>{c.fillStyle=col;for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(d[(y*w+x)*4+3]>110)c.fillRect(x+o,y+o,1,1);});
+  const d=t.getImageData(0,0,w,h).data;const on=(x,y)=>x>=0&&y>=0&&x<w&&y<h&&d[(y*w+x)*4+3]>128;
+  const P=2,SH=2;cv.width=w+P*2;cv.height=h+P*2+SH;const c=cv.getContext('2d');
+  const paint=(col,dx,dy,test)=>{c.fillStyle=col;for(let y=-2;y<h+2;y++)for(let x=-2;x<w+2;x++)if(test(x,y))c.fillRect(x+P+dx,y+P+dy,1,1);};
+  const edge=(x,y)=>!on(x,y)&&(on(x-1,y)||on(x+1,y)||on(x,y-1)||on(x,y+1));
+  paint(sh,0,SH,(x,y)=>on(x,y)||edge(x,y));
+  paint('#0A1428',0,0,edge);
+  paint(fg,0,0,on);
   cv.dataset.scale=scale;fitTitle(cv);
 }
 function fitTitle(cv){if(!cv.width)return;cv.style.width=Math.min(cv.width*(+cv.dataset.scale||4),cv.parentElement.clientWidth||300)+'px';cv.style.height='auto';}
@@ -1271,7 +1277,7 @@ $('#lead-form').addEventListener('submit',async e=>{
 
 /* ================== 開場與按鈕 ================== */
 function drawStatic(){
-  pixelText($('#title-cv'),['殺價魔王','大作戰'],20,'#F4CD3B','#E5483B',4);
+  pixelText($('#title-cv'),['殺價魔王','大作戰'],40,'#F4CD3B','#E5483B',2.1);
   drawSprite($('#t-me'),SPR.me);drawSprite($('#t-boss'),SPR.boss);
   drawSprite($('#me-cv'),SPR.me);drawSprite($('#lock-cv'),SPR.lock);drawSprite($('#done-cv'),SPR.key);
 }
