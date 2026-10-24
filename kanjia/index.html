@@ -112,6 +112,10 @@ input[type=range]{width:100%;accent-color:var(--gold);height:30px}
 .dialog .more{position:absolute;right:8px;bottom:3px;color:var(--gold);font-size:12px;font-weight:900;animation:blink .8s steps(2) infinite}
 .tip{font-size:14px;line-height:1.55;color:var(--paper);background:rgba(244,205,59,.1);border-left:4px solid var(--gold);padding:7px 10px;flex:0 0 auto}
 .tip b{color:var(--gold)}
+.tip>div+div{margin-top:4px}
+.tip .fx{font-weight:900}
+.tip .fx b{color:var(--rose)}
+.disc{font-size:12.5px;color:var(--mute);margin:0;line-height:1.6}
 .choices{display:flex;flex-direction:column;gap:8px;flex:0 0 auto}
 .opt{text-align:left;background:var(--paper);color:var(--ink);border:3px solid var(--ink);box-shadow:0 4px 0 var(--paper-2),0 4px 0 3px var(--ink);padding:9px 12px;font-size:15.5px;font-weight:700;line-height:1.45;position:relative}
 .opt:active{transform:translateY(3px);box-shadow:0 1px 0 var(--paper-2),0 1px 0 3px var(--ink)}
@@ -230,11 +234,11 @@ details.notice summary{cursor:pointer;font-weight:700;color:var(--navy)}
         <div class="vs">VS</div>
         <canvas id="t-boss" class="px idle" aria-hidden="true" style="animation-delay:.3s"></canvas>
       </div>
-      <p class="t-tag">不找仲介，自己賣房子。<br>白天上班、晚上帶看，還有殺價魔王等著你。<br>21 天，你撐得住嗎？</p>
+      <p class="t-tag">不找仲介，自己賣房子。<br>白天上班、晚上帶看，稅務、法規、殺價魔王一關比一關難。<br>21 天，你撐得住嗎？</p>
     </div>
     <div class="t-bot">
       <button id="start-btn" class="btn" type="button">開始挑戰</button>
-      <div class="t-meta">約 5 分鐘 · 免下載 · 免註冊</div>
+      <div class="t-meta">約 8 分鐘 · 免下載 · 免註冊</div>
       <div class="foot">日勝房屋 業務區長 吳松儒 Ryan</div>
     </div>
   </section>
@@ -268,7 +272,7 @@ details.notice summary{cursor:pointer;font-weight:700;color:var(--navy)}
   <section id="scr-play" class="scr" hidden>
     <div class="hud">
       <div class="stage"><span class="num" id="hud-day">DAY 1/21</span><b id="hud-title">週六</b></div>
-      <button id="kit-btn" class="icon-btn" type="button">求救 Ryan ×2</button>
+      <button id="kit-btn" class="icon-btn" type="button">求救 Ryan ×1</button>
       <button class="icon-btn snd-btn" type="button">音效 開</button>
     </div>
     <div class="arena" id="arena" data-scene="home">
@@ -311,6 +315,7 @@ details.notice summary{cursor:pointer;font-weight:700;color:var(--navy)}
     <div id="r-loss-wrap"><h3 class="sec-h">自己賣的代價</h3><div class="loss-list" id="r-loss"></div></div>
     <h3 class="sec-h">這 21 天學到的事</h3>
     <ul class="lessons" id="r-lessons"></ul>
+    <p class="disc">遊戲中的稅務與法規為簡化說明，以 2026 年規定設計。實際案件的稅額與適用條件，請洽地政士、國稅局或專業房仲。</p>
 
     <div class="bridge">
       <h3>這 21 天的事，其實不用你一個人扛</h3>
@@ -382,10 +387,12 @@ const DOW=['六','日','一','二','三','四','五'];
 const CONFIG = {
   lineId: '',                                  // LINE 官方帳號 ID（@開頭）；有填就用官方帳號一鍵帶訊息
   linePersonal: 'dr.song0729',                 // 個人 LINE ID；沒有官方帳號時，按鈕會開啟加好友頁
-  firebase: { apiKey: '', projectId: '' },     // 填了就把名單寫進 Firestore；留空為試玩模式
+  firebase: { apiKey: '', projectId: '' },     // 填了就把名單寫進 Firestore；留空則改用 LINE 聯繫
   collection: 'leads',
   days: 21
 };
+/* 難度參數 */
+const HARD={dealAt:65,viewCost:-8,regen:2,kit:1};
 
 /* ================== 像素圖 ================== */
 const D='#0A1428';
@@ -394,7 +401,7 @@ const SPR={
   "................","......DDDD..DD..",".....DRRRRD.DGD.","....DRRrRRRDDGD.","...DRRRRRRrRRDD.","..DRRrRRRRRRRRD.",".DDDDDDDDDDDDDDD","..DWWWWWWWWWWD..",
   "..DWYYWWWWYYWD..","..DWYKWWWWYKWD..","..DWWWWWWWWWWD..","..DWWWWBBWWWWD..","..DWWWWBBWWWWD..","..DWWWWBGWWWWD..","..DDDDDDDDDDDD..","................"]},
  me:{pal:{D,H:'#1E2233',S:'#F2C9A0',K:D,R:'#9a4a3a',W:'#F7F0DC',T:'#114F9C',N:'#2B3550'},rows:[
-  "................",".....DDDDDD.....","....DHHHHHHD....","....DHSSSSHD....","....DSKSSKSD....","....DSSSSSSD....","....DSRSSRSD....",".....DSRRSD.....",
+  "................",".....DDDDDD.....","....DHHHHHHD....","....DHSSSSHD....","....DSKSSKSD....","....DSSSSSSD....","....DSSSSSSD....",".....DSRRSD.....",
   "....DWWTTWWD....","...DWWWTTWWWD...","..DSWWWTTWWWSD..","..DSWWWTTWWWSD..","...DWWWWWWWWD...","...DNNNNNNNND...","...DNND..DNND...","...DDDD..DDDD..."]},
  meTired:{pal:{D,H:'#1E2233',S:'#E9C3A0',K:D,G:'#7d6a8a',B:'#7FC4FF',W:'#E6DDC6',T:'#114F9C',N:'#2B3550',M:'#8a5a5a'},rows:[
   "................",".....DDDDDD.....","....DHHHHHHD.B..","....DHSSSSHD.B..","....DSGSSGSD....","....DSKSSKSD....","....DSSMMSSD....",".....DSSSSD.....",
@@ -417,6 +424,9 @@ const SPR={
  doc:{pal:{D,W:'#F7F0DC',K:'#6b7590',R:'#E5483B'},rows:[
   "................","...DDDDDDDD.....","...DWWWWWWDD....","...DWKKKKWWDD...","...DWWWWWWWWD...","...DWKKKKKKWD...","...DWWWWWWWWD...","...DWKKKKKKWD...",
   "...DWWWWWWWWD...","...DWKKKKWWWD...","...DWWWWWRRWD...","...DWWWWRWWRD...","...DWWWWWRRWD...","...DDDDDDDDDD...","................","................"]},
+ calc:{pal:{D,K:'#2B3550',G:'#9fd3a8',W:'#F7F0DC',R:'#E5483B',Y:'#F4CD3B'},rows:[
+  "................","...DDDDDDDDDD...","...DKKKKKKKKD...","...DKGGGGGGKD...","...DKGGGGGGKD...","...DKKKKKKKKD...","...DKWDWDWDKD...","...DKDDDDDDKD...",
+  "...DKWDWDWDKD...","...DKDDDDDDKD...","...DKWDWDRDKD...","...DKDDDDDDKD...","...DKWDWDYDKD...","...DKKKKKKKKD...","...DDDDDDDDDD...","................"]},
  lock:{pal:{D,G:'#A9851A',Y:'#F4CD3B',K:D},rows:[
   "................",".....DDDDDD.....","....DD....DD....","...DD......DD...","...D........D...","...D........D...","..DDDDDDDDDDDD..","..DYYYYYYYYYYD..",
   "..DYYYYKKYYYYD..","..DYYYYKKYYYYD..","..DYYYYYKYYYYD..","..DYYYYYKYYYYD..","..DGGGGGGGGGGD..","..DDDDDDDDDDDD..","................","................"]},
@@ -438,28 +448,40 @@ function pixelText(cv,lines,size,fg,sh,scale){
 }
 function fitTitle(cv){if(!cv.width)return;cv.style.width=Math.min(cv.width*(+cv.dataset.scale||4),cv.parentElement.clientWidth||300)+'px';cv.style.height='auto';}
 
-/* ================== 買方（帶看與議價） ================== */
+/* ================== 買方題庫（每局隨機抽） ================== */
 // type: view = 看屋挑剔（可能起衝突）；nego = 議價。p = 價格變動（佔開價 %），h = 買方意願變動
 const BUYERS={
- wang:{name:'王先生',title:'比價達人',start:40,angry:'你這什麼態度？我是來看房子的耶！',
+ wang:{name:'王先生',title:'比價達人',start:34,pick:3,angry:'你這什麼態度？我是來看房子的耶！',
   intro:'手機裡存滿實價登錄的精算型買方，每一句都在跟別間比。',
-  rounds:[
+  pool:[
    {type:'view',say:'一進門就說：「這玄關好小，鞋櫃也太舊了吧。」',opts:[
      {k:'good',t:'鞋櫃很多人入住都會重做，我把附近系統櫃的行情給你參考。',h:22,p:0,fb:'喔，這樣算一算，其實還好。',tip:'把缺點換算成實際花費，買方就不會無限放大它。'},
      {k:'mid',t:'那鞋櫃的錢，我算你便宜一點。',h:12,p:-2,fb:'好啊，那我再看看其他地方。',tip:'小缺點就讓價，買方會一路找下去。'},
      {k:'bad',t:'你是來看房子，還是來挑毛病的？',h:-22,p:0,fb:'……我只是講一下而已。',tip:'看屋挑剔很正常，嗆回去只會讓買方想走。'}]},
+   {type:'view',say:'我剛剛在電梯聽住戶說，這棟的管委會很難搞耶。',opts:[
+     {k:'good',t:'管委會每個月開會，帳目都有公告，我把最近的會議紀錄給你看。',h:20,p:0,fb:'有公告帳目喔？那還不錯。',tip:'社區管理的疑慮，用資料回應最有說服力。'},
+     {k:'mid',t:'那是少數住戶啦，不然價格我再讓一點。',h:9,p:-2,fb:'所以真的有問題囉？',tip:'用讓價回應疑慮，等於間接承認問題存在。'},
+     {k:'bad',t:'誰講的？你跟我說是哪一戶！',h:-22,p:0,fb:'你這麼激動幹嘛……',tip:'追究是誰說的，只會讓買方覺得社區關係很差。'}]},
+   {type:'nego',say:'你這個開價是怎麼算出來的？有什麼根據？',opts:[
+     {k:'mid',t:'我也是大概抓的啦，你覺得多少合理？',h:8,p:-5,fb:'那我覺得打個九折差不多。',tip:'說不出開價根據，等於請買方幫你定價。'},
+     {k:'good',t:'我參考同社區近一年的實價登錄，再依樓層和屋況調整。',h:22,p:0,fb:'有做功課喔，那我們可以談。',tip:'開價有根據，議價時才站得住腳。'},
+     {k:'bad',t:'我當初買就花這麼多，總不能賠錢賣吧。',h:-16,p:0,fb:'你買多少是你的事啊。',tip:'你的買價是你的事，買方只在乎現在的行情。'}]},
    {type:'nego',say:'我查過實價登錄，同社區上個月才賣，比你便宜快一成喔。',opts:[
      {k:'good',t:'那戶是低樓層又沒車位，我們是高樓層邊間，單價本來就不一樣。',h:26,p:0,fb:'嗯……高樓層邊間，確實差蠻多的。',tip:'比價要比「條件」。樓層、車位、座向、屋況都會拉開單價。'},
      {k:'mid',t:'不然我少一點，跟他差不多就好。',h:14,p:-4,fb:'這麼爽快？那我再看看還能談多少。',tip:'還沒講清楚差在哪就先讓價，買方會覺得還能再砍。'},
      {k:'bad',t:'實價登錄都不準啦，你不要亂看。',h:-24,p:0,fb:'政府的資料不準？那你的開價是怎麼來的？',tip:'否定公開資料，只會讓買方覺得你在隱瞞什麼。'}]},
+   {type:'nego',say:'如果冷氣、廚具、沙發全部留給我，我就考慮。',opts:[
+     {k:'mid',t:'好啊，全部都留給你。',h:14,p:-1,set:'giveAll',fb:'這麼大方！那價格是不是也可以再……',tip:'東西一口答應全送，買方只會把它當成基本盤，價格照樣砍。'},
+     {k:'good',t:'冷氣和廚具可以留，沙發另外談，我們寫進點交清單。',h:22,p:0,fb:'有清單比較清楚，好。',tip:'附贈什麼要講清楚、寫進點交清單，交屋才不會吵。'},
+     {k:'bad',t:'家具很貴耶，要的話另外加錢。',h:-14,p:0,fb:'舊沙發還要加錢？',tip:'舊家具對買方價值不高，拿來加價只會扣分。'}]},
    {type:'nego',say:'我最多只能出到你開價的九折，再多就不買了。',opts:[
-     {k:'good',t:'九折差有點多，我們各退一步，九六折，交屋前幫你清潔好，可以嗎？',h:32,p:-4,fb:'九六折含清潔……好，我很有興趣。',tip:'讓步要小、要附條件，讓買方覺得是「談」來的。'},
+     {k:'good',t:'九折差有點多，我們各退一步，九六折，交屋前幫你清潔好，可以嗎？',h:30,p:-4,fb:'九六折含清潔……好，我很有興趣。',tip:'讓步要小、要附條件，讓買方覺得是「談」來的。'},
      {k:'bad',t:'九折？那你去買別間啦。',h:-30,p:0,fb:'好喔，那就這樣。',tip:'直接趕人很痛快，但也把一個真買方送走了。'},
-     {k:'mid',t:'好啦好啦，九折就九折。',h:42,p:-10,fb:'好！（心想：早知道開更低）',tip:'買方嘴裡的「最多」，通常不是真的最多。'}]}
+     {k:'mid',t:'好啦好啦，九折就九折。',h:40,p:-10,fb:'好！（心想：早知道開更低）',tip:'買方嘴裡的「最多」，通常不是真的最多。'}]}
   ]},
- lin:{name:'林媽媽',title:'挑剔阿姨',start:35,angry:'哎喲，講話這麼兇，我不想看了啦！',
+ lin:{name:'林媽媽',title:'挑剔阿姨',start:28,pick:4,angry:'哎喲，講話這麼兇，我不想看了啦！',
   intro:'嫌貨才是買貨人。她每個角落都看得很仔細，每個缺點都要你折錢。',
-  rounds:[
+  pool:[
    {type:'view',say:'哎喲，這面牆有壁癌耶，整理起來要花不少錢喔。',opts:[
      {k:'mid',t:'那這部分我折給你，總價再少一點。',h:14,p:-3,fb:'好啊，那我再找找還有哪裡要折。',tip:'小問題折太多，買方會繼續找下一個問題。'},
      {k:'good',t:'我們估過了，處理大概幾萬塊，報價單在這，不影響結構。',h:24,p:0,fb:'喔，有報價單，那還好。',tip:'把缺點「量化」，買方就不會無限放大它。'},
@@ -472,14 +494,26 @@ const BUYERS={
      {k:'good',t:'這間是東向，早上光線最好。週末早上我再約你來看一次？',h:22,p:0,fb:'早上來看啊……好，那我再來一次。',tip:'不同座向有最好看的時段，安排對的時間帶看，屋況會加分。'},
      {k:'bad',t:'把燈打開就好啦。',h:-20,p:0,fb:'買房子又不是買燈。',tip:'敷衍的回答會讓買方覺得問題被你看輕了。'},
      {k:'mid',t:'採光普通啦，所以開價才這樣。',h:6,p:-2,fb:'那價格應該還可以再低一點吧？',tip:'把價格跟缺點綁在一起，買方就會照著缺點砍價。'}]},
+   {type:'view',say:'這浴室好舊喔，我住進來一定要整個打掉重做。',opts:[
+     {k:'mid',t:'那裝潢費我幫你分攤一些。',h:12,p:-3,fb:'分攤多少？我算給你聽……',tip:'主動分攤裝潢費，買方會拿最貴的報價來跟你算。'},
+     {k:'bad',t:'嫌舊就去買新成屋啊。',h:-22,p:0,fb:'新成屋我還用來看你這間？',tip:'買中古屋本來就預期要整理，嗆回去只會讓買方走掉。'},
+     {k:'good',t:'管線前幾年換過，只是磁磚舊。施工單在這，你可以看看。',h:22,p:0,fb:'管線換過喔？那省很多。',tip:'看不到的地方（管線、防水）有整理過，就要拿出證明。'}]},
+   {type:'view',say:'樓下是不是有在做生意？晚上會不會很吵？',opts:[
+     {k:'good',t:'樓下是早餐店，下午兩點就關了。你可以晚上再來聽聽看。',h:20,p:0,fb:'早餐店喔，那還好。',tip:'讓買方自己去確認，比你說一百次「不吵」更有用。'},
+     {k:'mid',t:'會一點點啦，所以價格可以談。',h:5,p:-2,fb:'會吵喔……那要算便宜很多。',tip:'沒問題的事被你說成有問題，平白多一個殺價理由。'},
+     {k:'bad',t:'哪裡不吵？你要安靜去住山上啊。',h:-22,p:0,fb:'你講話怎麼這樣！',tip:'對生活品質的疑慮要認真回答，買方是要住很久的。'}]},
+   {type:'view',say:'我很在意這個：這間以前有沒有發生過什麼事？',opts:[
+     {k:'mid',t:'應該沒有吧，以前的事我也不太清楚。',h:-6,p:0,fb:'你自己的房子怎麼會不清楚？',tip:'屋主對屋況說不清楚，買方只會更不安。'},
+     {k:'good',t:'沒有。這是我自己住的，我也願意在現況說明書上寫清楚。',h:24,p:0,fb:'願意寫下來，那我就放心了。',tip:'重要的屋況資訊，屋主有告知義務。願意寫進文件，買方最安心。'},
+     {k:'bad',t:'這種問題很觸霉頭耶，不要問啦。',h:-18,p:0,fb:'不回答？那我更擔心了。',tip:'迴避敏感問題，買方會往最壞的方向想。'}]},
    {type:'nego',say:'我兒子說這價錢太貴了，叫我再殺兩成。',opts:[
      {k:'mid',t:'兩成不行啦，一成可以。',h:24,p:-10,fb:'一成喔？好，我回去跟兒子說。',tip:'被嚇到就直接讓一成，是屋主最常見的失守。'},
      {k:'bad',t:'那叫你兒子自己來買。',h:-30,p:0,fb:'你這樣講話就不對了喔！',tip:'對買方的家人不客氣，等於把整個家庭都得罪了。'},
-     {k:'good',t:'兩成差太多了。你兒子要不要一起來看？我把附近成交資料整理給他。',h:30,p:0,fb:'也好，讓他自己看看資料。',tip:'真正做決定的人沒來，就想辦法讓他來，不要對著傳話的人讓價。'}]}
+     {k:'good',t:'兩成差太多了。你兒子要不要一起來看？我把附近成交資料整理給他。',h:28,p:0,fb:'也好，讓他自己看看資料。',tip:'真正做決定的人沒來，就想辦法讓他來，不要對著傳話的人讓價。'}]}
   ]},
- boss:{name:'黑董',title:'殺價魔王',start:28,angry:'呵，沉不住氣啊。',
+ boss:{name:'黑董',title:'殺價魔王',start:22,pick:3,angry:'呵，沉不住氣啊。',
   intro:'手上現金滿滿的投資客，專挑累壞、急著賣的屋主下手。最後的大魔王！',
-  rounds:[
+  pool:[
    {type:'nego',say:'我現金買，不用貸款。你開價直接打八折。',opts:[
      {k:'bad',t:'現金了不起喔？',h:-24,p:0,fb:'呵，脾氣倒是不小。',tip:'被激怒就輸了。投資客最喜歡看屋主沉不住氣。'},
      {k:'mid',t:'現金喔……那九折我可以考慮。',h:14,p:-10,fb:'九折？看來還有空間。',tip:'付款方式和價格是兩件事，不要因為「現金」就讓一成。'},
@@ -492,42 +526,167 @@ const BUYERS={
      {k:'mid',t:'真的嗎……那我少一點好了。',h:10,p:-5,fb:'這就對了，識時務。',tip:'被唱衰行情就降價，正中投資客下懷。'},
      {k:'bad',t:'你才崩，你全家都崩！',h:-32,p:0,fb:'？？？',tip:'很解氣，但這一局你也崩了。'},
      {k:'good',t:'市場怎麼走沒人說得準，但這區的機能和交通不會跑，自住的人一直都在找。',h:22,p:0,fb:'嗯……這區自住需求確實不少。',tip:'回到地段和需求，不跟對方猜行情。'}]},
-   {type:'nego',say:'最後一口價：你開價的八五折，現在就簽。',opts:[
+   {type:'nego',say:'你房子還有貸款沒還清吧？有的話我要扣錢，風險我在扛。',opts:[
+     {k:'bad',t:'有沒有貸款關你什麼事？',h:-24,p:0,fb:'不說清楚，我怎麼敢買？',tip:'買方問貸款是合理的，要用制度回答，不是用情緒。'},
+     {k:'good',t:'有貸款沒關係，用履約保證，尾款會先代償銀行、塗銷抵押，你的錢很安全。',h:22,p:0,fb:'……有履保的話，倒也還好。',tip:'屋主有房貸很常見，透過履約保證代償塗銷，不需要因此讓價。'},
+     {k:'mid',t:'那我少一點，算是給你的風險補償。',h:10,p:-4,fb:'早這樣說不就好了。',tip:'用讓價去換對方的安心，是最貴的做法。'}]},
+   {type:'nego',say:'我請人估過了，你這間最多值開價的八成五。',opts:[
+     {k:'good',t:'方便讓我看一下估價報告嗎？我這邊也有附近的成交資料，我們對一下。',h:20,p:0,fb:'……報告在我辦公室啦。',tip:'對方拿「估價」壓你時，請他拿出來，用資料對資料。'},
+     {k:'mid',t:'八成五太少，九成好了。',h:14,p:-10,fb:'九成？好，我們有交集了。',tip:'對方隨口一個數字，你就在那個數字附近談，等於被他定錨了。'},
+     {k:'bad',t:'你那個估價的人根本不專業。',h:-22,p:0,fb:'那你找專業的來啊。',tip:'攻擊對方的人，不如檢驗對方的資料。'}]}
+  ],
+  final:{type:'nego',say:'最後一口價：你開價的八五折，現在就簽。',opts:[
      {k:'mid',t:'好……八五折就八五折。',h:50,p:-15,fb:'簽約愉快！（轉身偷笑）',tip:'「最後一口價」常常是談判話術，不一定真的是最後。'},
-     {k:'good',t:'謝謝你的誠意。九五折，這週就能簽，這是我的底線。',h:36,p:-5,fb:'……九五折。好吧，算你厲害。',tip:'給出清楚的底線和成交時間，讓對方知道再壓也沒用。'},
+     {k:'good',t:'謝謝你的誠意。九五折，這週就能簽，這是我的底線。',h:34,p:-5,fb:'……九五折。好吧，算你厲害。',tip:'給出清楚的底線和成交時間，讓對方知道再壓也沒用。'},
      {k:'bad',t:'不賣了！',h:-40,p:0,fb:'那就算了。',tip:'情緒性收尾，前面的努力全部歸零。'}]}
-  ]}
+ }
 };
-const AD_ROUND={type:'view',say:'等一下，廣告寫四房，這間根本是陽台外推的吧？',opts:[
-  {k:'good',t:'抱歉廣告寫得不清楚，這間是外推增建，價格我是以三房在算的。',h:4,p:0,fb:'……好吧，至少你有承認。',tip:'廣告寫不實，買方一進門信任就沒了，只能盡量補救。'},
-  {k:'mid',t:'外推的也可以當房間用啦，不然我算你便宜一點。',h:-6,p:-4,fb:'所以廣告是寫假的嘛。',tip:'被抓到廣告不實再讓價，等於先失信再失價。'},
-  {k:'bad',t:'大家都這樣寫啊，又不是只有我。',h:-24,p:0,fb:'大家都這樣，不代表你這樣是對的。',tip:'廣告不實還硬拗，買方會直接把你列入黑名單。'}]};
 
-/* ================== 21 天劇本 ================== */
-const weekday=d=>{while(['六','日'].includes(DOW[(d-1)%7]))d++;return d;};
-const FX_WORK_TIP='屋主上班時間跟買方看屋時間，常常撞在一起。';
-const STEPS=[
- {id:'ad',day:1,scene:'night',who:{sp:'doc',name:'自己刊登',title:'591 廣告'},
-  pre:[{t:'週末一早，你開始自己拍照、量坪數、寫廣告文案，一路弄到半夜一點。',fx:{e:-10,late:1}}],
-  q:'家裡有一間是陽台外推出來的小房間。廣告要怎麼寫？',
+/* 廣告的兩種情境（每局隨機） */
+const AD_VARIANTS=[
+ {q:'家裡有一間是陽台外推出來的小房間。廣告要怎麼寫？',
   opts:[
    {k:'bad',trap:1,t:'寫「四房」，看起來比較大、比較好賣。',set:'adFake',fb:'刊登完成，點閱數衝很高！',tip:'外推增建不是合法房間。廣告寫四房，買方看屋時發現，信任會直接歸零。'},
    {k:'good',t:'寫「三房＋陽台外推」，照實說明。',fb:'點閱少了一些，但來問的人都比較認真。',tip:'照實寫，反而能篩掉之後會翻臉的買方。'},
-   {k:'mid',t:'先不寫房間數，照片多放幾張就好。',e:-6,fb:'結果每個打來的人第一句都問「幾房？」，你又多接了十幾通電話。',tip:'資訊寫不清楚，只會換來更多重複的詢問電話。'}]},
- {id:'calls',day:2,scene:'home',who:{sp:'phone',name:'手機',title:'響個不停'},
-  pre:[{t:'廣告上架第一天，手機響了 23 通。一半是仲介問能不能讓他們賣，還有人一開口就問「最低多少」。'}],
-  q:'這些電話，你打算怎麼處理？',
+   {k:'mid',t:'先不寫房間數，照片多放幾張就好。',e:-8,fb:'結果每個打來的人第一句都問「幾房？」，你又多接了十幾通電話。',tip:'資訊寫不清楚，只會換來更多重複的詢問電話。'}],
+  round:{type:'view',say:'等一下，廣告寫四房，這間根本是陽台外推的吧？',opts:[
+   {k:'good',t:'抱歉廣告寫得不清楚，這間是外推增建，價格我是以三房在算的。',h:4,p:0,fb:'……好吧，至少你有承認。',tip:'廣告寫不實，買方一進門信任就沒了，只能盡量補救。'},
+   {k:'mid',t:'外推的也可以當房間用啦，不然我算你便宜一點。',h:-6,p:-4,fb:'所以廣告是寫假的嘛。',tip:'被抓到廣告不實再讓價，等於先失信再失價。'},
+   {k:'bad',t:'大家都這樣寫啊，又不是只有我。',h:-24,p:0,fb:'大家都這樣，不代表你這樣是對的。',tip:'廣告不實還硬拗，買方會直接把你列入黑名單。'}]}},
+ {q:'權狀上寫 32 坪，但你量了一下，室內大概只有 22 坪。廣告要怎麼寫？',
+  opts:[
+   {k:'bad',trap:1,t:'寫「室內 32 坪」，數字大比較吸引人。',set:'adFake',fb:'刊登完成，詢問電話變多了！',tip:'權狀坪數含公設和附屬建物，寫成「室內」就是廣告不實。'},
+   {k:'good',t:'寫「權狀 32 坪（含公設）」，再附上平面圖。',fb:'詢問少了一點，但沒有人誤會。',tip:'坪數寫清楚是哪一種，看屋時才不會被質疑灌水。'},
+   {k:'mid',t:'坪數先不寫，叫他們來看就知道。',e:-8,fb:'每通電話都在問坪數，你一天回了二十幾次。',tip:'關鍵資訊不寫，只會讓你接更多電話。'}],
+  round:{type:'view',say:'廣告寫室內 32 坪？我量起來根本沒有，你這是灌水吧！',opts:[
+   {k:'good',t:'抱歉是我寫錯了，32 坪是權狀坪數，含公設。單價我是用權狀坪數算的。',h:4,p:0,fb:'……下次寫清楚一點。',tip:'寫錯了就立刻承認、講清楚計算方式，是唯一的補救。'},
+   {k:'mid',t:'大家都是這樣算的啦，不然單價算你低一點。',h:-6,p:-4,fb:'所以你知道是灌水的嘛。',tip:'被抓到灌水再讓價，等於先失信再失價。'},
+   {k:'bad',t:'是你量錯了吧。',h:-24,p:0,fb:'我量錯？好，那我們不用談了。',tip:'坪數被質疑還硬拗，買方會直接走人。'}]}}
+];
+const CALLS_VARIANTS=[
+ {pre:'廣告上架第一天，手機響了 23 通。一半是仲介問能不能讓他們賣，還有人一開口就問「最低多少」。',q:'這些電話，你打算怎麼處理？',
   opts:[
    {k:'mid',t:'每一通都接，怕漏掉真的買方。',e:-15,fb:'一天講下來喉嚨都啞了，真正想看房的只有兩組。',tip:'自售最累的是過濾電話。房仲會先幫你篩掉看熱鬧和同業。'},
-   {k:'good',t:'開靜音，晚上集中回撥，先問清楚預算和需求。',e:-8,fb:'晚上回撥，篩出兩組比較認真的。不過有一組已經去看別間了。',tip:'先問預算、需求、看屋時間，可以省下很多白跑的帶看。'},
+   {k:'good',t:'開靜音，晚上集中回撥，先問清楚預算和需求。',e:-8,heartAll:-3,fb:'晚上回撥，篩出兩組比較認真的。不過有一組已經去看別間了。',tip:'先問預算、需求、看屋時間，可以省下很多白跑的帶看。'},
    {k:'bad',trap:1,t:'有人問最低價，就直接說「九折可以談」。',e:-6,set:'floor',fb:'對方說：「好，我考慮看看。」掛掉後你有點後悔。',tip:'底價一說出口就收不回來，消息還可能傳到其他買方耳裡。'}]},
+ {pre:'有人打電話來：「我很有興趣！可以先把你的身分證和權狀拍照傳給我，我確認一下屋主是不是本人嗎？」',q:'你要怎麼回？',
+  opts:[
+   {k:'bad',trap:1,t:'好啊，傳過去讓他安心。',set:'idLeak',fb:'對方說：「收到，我再跟你約時間。」之後就沒消息了。',tip:'身分證和權狀影本不能隨便給陌生人，可能被拿去冒名刊登或詐騙。'},
+   {k:'good',t:'請他先來看房，真的要買，簽約時由代書當面核對身分。',e:-3,fb:'對方支支吾吾，說再聯絡。你直覺這通電話不太對勁。',tip:'核對身分是代書在簽約時做的事，看房前不需要給任何證件。'},
+   {k:'mid',trap:1,t:'只傳權狀，身分證就先不要。',set:'idLeakLite',fb:'對方說：「好，那我研究一下。」',tip:'權狀上有地號、地址和屋主姓名，一樣可能被拿去冒用。'}]}
+];
+
+/* 突發事件（每局隨機抽 2 個） */
+const ANNOY=[
+ {who:{sp:'phone',name:'買方',title:'放鳥'},scene:'night',pre:'約好晚上 7 點看房的買方，你提早下班、打掃完等了一個小時，對方沒來，電話也不接。',q:'你要怎麼處理？',
+  fx0:{e:-8,j:-4},
+  opts:[
+   {k:'mid',t:'再打三通電話。',e:-4,fb:{who:'買方：',t:'喔我忘了，改天再說。'},tip:'自售很常遇到放鳥，每一次都花掉你的下班時間。'},
+   {k:'mid',t:'傳訊息約下一次。',e:-2,fb:'已讀不回。',tip:'自售很常遇到放鳥，每一次都花掉你的下班時間。'},
+   {k:'mid',t:'把這個號碼封鎖。',heartAll:-3,fb:'一週後他又打來說想看，但你已經接不到了。',tip:'情緒上來就斷聯，有時候會錯過真買方。'}]},
+ {who:{sp:'house',name:'同社區',title:'有人降價'},scene:'home',pre:'同社區另一戶開始降價求售，開價比你低 5%。',q:'你的開價要怎麼調整？',
+  opts:[
+   {k:'mid',t:'跟著降 5%，不能輸。',base:-5,fb:'開價降了，詢問電話稍微變多。',tip:'被別人牽著降價，等於讓整個社區一起往下殺。'},
+   {k:'good',t:'維持開價，整理一份跟那戶的條件比較表。',e:-8,late:1,heartAll:-3,fb:'你熬夜做好比較表。不過有些買方還是先去看那一戶。',tip:'行情被打亂時，要有資料說明為什麼你的房子值這個價。'},
+   {k:'bad',t:'降 10%，一次贏過他。',base:-10,fb:'電話一下子多了起來……但你少了一大筆。',tip:'恐慌性降價，降掉的錢永遠回不來。'}]},
+ {who:{sp:'mgr',name:'部門主管',title:'臨時交辦'},scene:'office',pre:'主管臨時要你下週出差三天。可是你這週末已經約了兩組看房。',q:'怎麼辦？',
+  opts:[
+   {k:'mid',t:'推掉出差。',j:-18,fb:{who:'主管：',t:'……好，我找別人去。'},tip:'為了賣房推掉工作，主管會記住的。'},
+   {k:'mid',t:'去出差，看房延期。',heartAll:-8,fb:'兩組買方都說「那再說吧」。',tip:'買方的熱度不等人，延期常常就沒有下文。'},
+   {k:'mid',t:'去出差，請家人代為帶看。',heartAll:-4,e:-4,fb:'家人不熟屋況，被問倒好幾題，還打電話問你。',tip:'不熟房子的人帶看，買方問什麼都答不出來。'}]},
+ {who:{sp:'house',name:'颱風夜',title:'窗邊滲水'},scene:'night',pre:'颱風天，你發現主臥窗邊在滲水。明天就有人要來看房。',q:'你要怎麼處理？',
+  opts:[
+   {k:'good',t:'連夜找師傅臨時處理，之後再做好防水。',e:-14,late:1,loss:1.5,lossLabel:'窗邊防水修繕',fb:'師傅半夜才來，弄到兩點。',tip:'屋況問題要處理，也要記錄下來，之後才能說清楚。'},
+   {k:'bad',trap:1,t:'先擦乾，看房時不要提。',set:'windowLeak',fb:'看房很順利，沒人發現。',tip:'知道的瑕疵不說，交屋後可能被要求賠償。'},
+   {k:'mid',t:'直接跟買方說，價格可以再談。',base:-2,fb:'買方說：「那我要再考慮一下。」',tip:'誠實是對的，但沒處理的問題會直接變成殺價籌碼。'}]},
+ {who:{sp:'phone',name:'家人',title:'晚餐時間'},scene:'night',pre:'家人一直問：「怎麼還沒賣掉？要不要降價？」晚餐吃到一半就吵起來。',q:'你怎麼回應？',
+  opts:[
+   {k:'mid',t:'好啦，降 3% 總可以了吧。',base:-3,fb:'家人安靜了，你卻心情很差。',tip:'被家裡的壓力逼著降價，常常降得不甘願又沒效。'},
+   {k:'bad',t:'你們又不懂，不要管我！',fight:1,e:-8,fb:'整個晚上沒人跟你說話。',tip:'賣房的壓力，常常會轉到家人身上。'},
+   {k:'mid',t:'什麼都不說，自己默默扛下來。',e:-12,fb:'你躺在床上，一直想到半夜。',tip:'賣房是長期戰，壓力沒有出口，體力會先垮。'}]},
+ {who:{sp:'mgr',name:'部門主管',title:'考核面談'},scene:'office',pre:'主管在面談時提到：「你最近上班常看手機，請假也變多了。」',q:'你怎麼回答？',
+  opts:[
+   {k:'mid',t:'老實說在賣房子，請主管體諒。',j:-6,fb:{who:'主管：',t:'私事要處理好，不要影響工作。'},tip:'工作和賣房搶時間，主管不會一直體諒。'},
+   {k:'mid',t:'保證會改善，房子的事晚上再處理。',e:-12,late:1,fb:'你開始每天晚上回訊息到半夜。',tip:'把賣房全塞到晚上，就是拿睡眠去換。'},
+   {k:'bad',t:'沒說什麼，點頭帶過。',j:-12,fb:'主管在考核表上寫了「專注度不足」。',tip:'不溝通，主管只看得到你的分心。'}]},
+ {who:{sp:'phone',name:'假買方',title:'其實是仲介'},scene:'home',pre:'一位「買方」來看房，問了很多問題：最低多少？急不急？還有誰在看？',q:'他問你最低可以多少，你怎麼回？',
+  opts:[
+   {k:'bad',trap:1,t:'老實跟他說九折可以。',set:'floor',fb:'他笑著說：「了解。」後來你才發現他是附近的仲介，想來探你的底。',tip:'底價一說出口，就可能傳遍整個商圈。'},
+   {k:'good',t:'價格要看完、有誠意出價再談。',e:-4,fb:'他看完就走了，再也沒聯絡。後來你才知道他是同業。',tip:'自售時很難分辨誰是真買方，白花時間是常態。'},
+   {k:'mid',t:'反問他預算多少。',e:-4,fb:'他說：「我隨便看看。」你白白花了一個小時。',tip:'自售時很難分辨誰是真買方，白花時間是常態。'}]}
+];
+
+/* 法規與稅務題庫（每局隨機抽，以 2026 年規定為準的簡化說明） */
+const LAW=[
+ {phase:'pre',who:{sp:'doc',name:'代書',title:'先問清楚'},q:'如果你收了買方 10 萬定金，後來你反悔，想賣給出價更高的人。依法要怎麼處理？',
+  opts:[{t:'退還 10 萬就好'},{t:'要加倍返還，也就是 20 萬',ok:1},{t:'定金本來就歸賣方，不用退'}],
+  wrong:{fx:{loss:10,lossLabel:'定金糾紛（加倍返還）',fight:1,e:-10},fb:'買方依法要求加倍返還，還申請了調解。'},
+  explain:'民法第 249 條：收受定金的一方違約，要加倍返還定金；付定金的一方違約，定金不用還。'},
+ {phase:'pre',who:{sp:'doc',name:'地政事務所',title:'自己辦過戶'},q:'你決定連代書都省了，自己辦過戶。實價登錄要怎麼處理？',
+  opts:[{t:'成交後一年內上網報就好'},{t:'買賣雙方在申請移轉登記時一起申報',ok:1},{t:'價格報低一點，比較不會被注意'}],
+  wrong:{fx:{loss:3,lossLabel:'實價登錄罰鍰',j:-8},fb:'地政事務所通知你補正，你又請了半天假。'},
+  explain:'實價登錄 2.0：買賣案件由買賣雙方在申請移轉登記時一併申報。價格申報不實，可處 3 萬到 15 萬元罰鍰。'},
+ {phase:'pre',who:{sp:'phone',name:'朋友',title:'LINE 問你'},q:'房地合一稅的「自住優惠」（400 萬以內免稅），下面哪一種情況「不能」用？',
+  opts:[{t:'房子 3 年前曾出租過一年',ok:1},{t:'你和配偶都設籍在這裡'},{t:'持有並自住滿 8 年'}],
+  wrong:{fx:{lossPct:0.8,lossLabel:'自住優惠判斷錯誤，補稅',e:-6},fb:'國稅局查到出租紀錄，要你補稅。'},
+  explain:'自住優惠要本人、配偶或未成年子女設籍，持有並居住連續滿 6 年，而且交易前 6 年內沒有出租、營業或執行業務使用。'},
+ {phase:'pre',who:{sp:'doc',name:'代書',title:'考你一題'},q:'土地增值稅想用 10% 的「自用住宅稅率」，下面哪個條件是必要的？',
+  opts:[{t:'出售前一年內，房子沒有出租或營業',ok:1},{t:'房子要是屋齡 10 年內'},{t:'賣方要年滿 65 歲'}],
+  wrong:{fx:{lossPct:0.6,lossLabel:'土增稅沒用到自用稅率',e:-4},fb:'你沒準備好文件，被用一般稅率課稅。'},
+  explain:'自用住宅用地要有本人、配偶或直系親屬設籍，出售前一年內沒有出租或營業。一般用地稅率是 20% 到 40%，自用是 10%。'},
+ {phase:'pre',who:{sp:'phone',name:'鄰居',title:'聊天'},q:'你的房子是 2012 年買的。現在賣掉，要繳房地合一稅嗎？',
+  opts:[{t:'要，所有房子都適用'},{t:'不用，2016 年以前取得的適用舊制',ok:1},{t:'不用，持有超過 10 年就全部免稅'}],
+  wrong:{fx:{e:-10,j:-6,loss:1,lossLabel:'多跑國稅局、多付諮詢費'},fb:'你搞錯制度，多跑了兩趟國稅局才弄清楚。'},
+  explain:'2016 年 1 月 1 日以後取得的房地才適用房地合一稅。之前取得的適用舊制：房屋部分的財產交易所得併入綜合所得稅，土地繳土地增值稅。'},
+ {phase:'pre',who:{sp:'doc',name:'代書',title:'合約條款'},q:'合約寫「現況交屋，賣方不負瑕疵擔保責任」。你知道浴室漏過水但沒說，交屋後買方發現了。你要負責嗎？',
+  opts:[{t:'不用，合約寫得很清楚'},{t:'要，故意不告知瑕疵，免責約定無效',ok:1},{t:'只要交屋超過一個月就不用'}],
+  wrong:{fx:{lossPct:0.8,lossLabel:'瑕疵擔保求償',fight:1,e:-8},fb:'買方請律師寄存證信函，你最後還是賠了修繕費。'},
+  explain:'民法第 366 條：賣方故意不告知瑕疵，約定免除或限制擔保責任的條款無效。'},
+ {phase:'pre',who:{sp:'calc',name:'試算',title:'房地合一'},q:'計算房地合一稅時，你找不到當年仲介費、代書費的收據。可以扣除多少費用？',
+  opts:[{t:'一毛都不能扣'},{t:'依成交價 3% 計算，最多 30 萬',ok:1},{t:'依成交價 10% 計算'}],
+  wrong:{fx:{lossPct:0.4,lossLabel:'費用算錯，多繳或被補稅',e:-4},fb:'你的申報數字不對，被國稅局通知更正。'},
+  explain:'沒有費用證明時，可按成交價 3% 計算可減除費用，但最多 30 萬元。'},
+ {phase:'pre',who:{sp:'phone',name:'朋友',title:'換屋計畫'},q:'你打算賣掉舊家、再買一間自住。想申請「重購退稅」，新舊房子的過戶時間要相隔多久之內？',
+  opts:[{t:'2 年內',ok:1},{t:'5 年內'},{t:'沒有期限'}],
+  wrong:{fx:{lossPct:0.6,lossLabel:'錯過重購退稅'},fb:'你等太久才買新房，退稅資格過期了。'},
+  explain:'重購退稅：新舊房地的移轉登記要在 2 年內，都要自住設籍，而且新房地 5 年內不能改作他用或再轉賣。'},
+ {phase:'pre',who:{sp:'calc',name:'試算',title:'稅率'},q:'你持有房子 4 年，不符合自住優惠。房地合一稅的稅率是多少？',
+  opts:[{t:'35%',ok:1},{t:'20%'},{t:'15%'}],
+  wrong:{fx:{lossPct:0.5,lossLabel:'稅率算錯，補稅',e:-4},fb:'你的申報少算了，被國稅局要求補稅。'},
+  explain:'房地合一稅（境內個人）：持有 2 年內 45%，2 到 5 年 35%，5 到 10 年 20%，超過 10 年 15%。'},
+ {phase:'pre',who:{sp:'wang',name:'買方',title:'問坪數'},q:'買方問：「頂樓加蓋、陽台外推這些增建，有算在權狀坪數裡嗎？」',
+  opts:[{t:'有，所以單價要一起算'},{t:'沒有，增建不在權狀上，銀行通常也不估價',ok:1},{t:'屋主說算就算'}],
+  wrong:{fx:{heartAll:-8,fight:1},fb:'買方說你亂講，回去查了才知道。之後的買方都聽說了。'},
+  explain:'增建不在權狀登記範圍內，銀行通常不列入估價，有被拆除的風險。'},
+ {phase:'post',who:{sp:'calc',name:'國稅局',title:'申報期限'},q:'房子過戶完成了。房地合一稅什麼時候要申報？',
+  opts:[{t:'隔年五月報綜所稅時一起報'},{t:'完成移轉登記的次日起 30 日內',ok:1},{t:'沒賺錢就不用報'}],
+  wrong:{fx:{loss:1,lossLabel:'逾期申報罰鍰',j:-8},fb:'國稅局寄來通知，你逾期了，還要請假去處理。'},
+  explain:'房地合一稅是單獨申報：完成移轉登記次日起 30 日內申報，就算沒有應納稅額也要申報。'},
+ {phase:'post',who:{sp:'wang',name:'買方',title:'問稅費'},q:'買方問：「契稅是誰要繳？」',
+  opts:[{t:'買方繳',ok:1},{t:'賣方繳'},{t:'一人一半'}],
+  wrong:{fx:{loss:3,lossLabel:'多付了不該你付的契稅'},fb:'你在合約上答應了，只好自己付。'},
+  explain:'買賣契稅由買方申報繳納，稅率是契價的 6%。土地增值稅則由賣方繳納。'},
+ {phase:'post',who:{sp:'doc',name:'代書',title:'交屋前'},q:'交屋時，今年的房屋稅和地價稅要怎麼處理？',
+  opts:[{t:'稅單寫賣方名字，所以都賣方繳'},{t:'依交屋日按天數分算，雙方各自負擔',ok:1},{t:'既然賣了，就全部給買方繳'}],
+  wrong:{fx:{loss:1.5,lossLabel:'房屋稅、地價稅沒分算',fight:1},fb:'雙方對稅單吵了一輪，最後你吃虧。'},
+  explain:'實務上通常以交屋日為準，房屋稅、地價稅按天數分算，並寫進合約。'}
+];
+
+/* ================== 21 天劇本 ================== */
+const weekday=d=>{while(['六','日'].includes(DOW[(d-1)%7]))d++;return d;};
+const STEPS=[
+ {id:'ad',day:1,scene:'night',who:{sp:'doc',name:'自己刊登',title:'591 廣告'},
+  pre:[{t:'週末一早，你開始自己拍照、量坪數、寫廣告文案，一路弄到半夜一點。',fx:{e:-10,late:1}}],
+  variant:()=>AD_VARIANTS[G.v.ad]},
+ {id:'calls',day:2,scene:'home',who:{sp:'phone',name:'手機',title:'響個不停'},variant:()=>{const v=CALLS_VARIANTS[G.v.calls];return {pre:[{t:v.pre}],q:v.q,opts:v.opts};}},
  {id:'wangcall',day:3,scene:'office',who:{sp:'mgr',name:'部門主管',title:'週一例會'},
   pre:[{t:'週一早上 10 點，你在開部門會議，手機一直震。是看到廣告的王先生，想約週三下午 3 點看房。'}],
   q:'會議還在進行，怎麼辦？',
   opts:[
-   {k:'mid',t:'跟主管請半天假。',j:-12,leave:.5,fb:{who:'主管：',t:'又要請假？專案很趕，你知道吧。'},tip:FX_WORK_TIP},
+   {k:'mid',t:'跟主管請半天假。',j:-12,leave:.5,fb:{who:'主管：',t:'又要請假？專案很趕，你知道吧。'},tip:'屋主上班時間跟買方看屋時間，常常撞在一起。'},
    {k:'good',t:'會後回電，請王先生改到晚上 7 點。',e:-8,heart:{wang:-6},fb:{who:'王先生：',t:'晚上喔……好吧，但我只能待半小時。'},tip:'改時間可以保住工作，但買方的熱度會一點一點流失。'},
    {k:'bad',t:'會議中偷偷回訊息。',j:-12,fb:{who:'主管：',t:'你剛剛說的數字是多少？……你有在聽嗎？'},tip:'一邊上班一邊接買方，兩邊都顧不好。'}]},
+ {id:'law1',day:4,kind:'law',phase:'pre'},
  {id:'vwang',day:5,kind:'view',buyer:'wang'},
  {id:'deposit',day:5,when:()=>G.flags.wangDeal,scene:'home',who:{sp:'wang',name:'王先生',title:'想下訂'},
   pre:[{who:'王先生：',t:'我很喜歡這間！我先付 10 萬訂金，你寫張收據給我就好。'}],
@@ -536,18 +695,25 @@ const STEPS=[
    {k:'bad',trap:1,t:'好，手寫一張收據，先把錢收下來。',set:'handReceipt',fb:'你收下 10 萬，心裡踏實多了。'},
    {k:'good',t:'先約代書擬好條款，也問清楚他的自備款和貸款。',j:-12,e:-6,leave:.5,set:'depositOk',fb:'你又請了半天假，跑了一趟代書事務所。',tip:'收訂金前把條款和買方資金確認好，最能保護自己。'},
    {k:'mid',trap:1,t:'不用收訂金，口頭說好就好。',set:'verbal',fb:{who:'王先生：',t:'好啊，那我下週來簽約！'}}]},
+ {id:'idconseq',day:6,when:()=>G.flags.idLeak||G.flags.idLeakLite,kind:'narr',scene:'night',who:{sp:'phone',name:'陌生來電',title:'出事了'},
+  lines:()=>[{t:G.flags.idLeak?'有人拿你的身分證和權狀照片，在網路上冒充屋主刊登「急售」，還跟好幾個人收了訂金。':'有人拿你的權狀照片，冒名在網路上刊登你家「急售」。'},
+   {who:'陌生人（電話）：',t:'你是屋主嗎？我已經匯訂金了，什麼時候可以看房？'},
+   {t:'你只好去報案、跟平台申訴，一個一個解釋。',fx:G.flags.idLeak?{e:-16,j:-10,leave:1}:{e:-10,j:-6}}],
+  tip:'身分證和權狀影本不要給沒見過面的人。核對身分是簽約時由代書當面做的事。'},
  {id:'wangback',day:7,when:()=>G.flags.wangDeal,kind:'narr',scene:'office',who:{sp:'phone',name:'王先生',title:'來電'},
   lines:()=>{const L=[{who:'王先生（電話）：',t:'不好意思，我家人反對，房子我不買了。'}];
    if(G.flags.handReceipt)L.push({t:'收據上沒寫違約怎麼處理。他要你把 10 萬全部退回，你不肯，他說要申請調解。你為了調解又請了一天假。',fx:{e:-14,j:-14,leave:1,fight:1}});
-   else if(G.flags.verbal)L.push({t:'口頭約定沒有保障。你為了等他簽約，推掉了另外兩組看屋，等於白忙一週。',fx:{e:-8}});
+   else if(G.flags.verbal)L.push({t:'口頭約定沒有保障。你為了等他簽約，推掉了另外兩組看屋，等於白忙一週。',fx:{e:-8,heartAll:-4}});
    else L.push({t:'還好事先請代書把條款寫清楚，違約怎麼處理雙方照約定走，你沒有額外損失。',fx:{e:-2}});
    return L;},
   tip:()=>G.flags.depositOk?'事前多花的時間，換來事後不用吵架。':'訂金收據要寫清楚違約條款。透過房仲成交，會先用斡旋金或要約書，再加上代書和履約保證，規則一開始就講清楚。'},
+ {id:'rand1',day:8,kind:'rand'},
+ {id:'law2',day:9,kind:'law',phase:'pre'},
  {id:'overtime',day:10,scene:'office',who:{sp:'mgr',name:'部門主管',title:'專案結案'},
   pre:[{t:'專案結案前，主管要大家留下來加班。這時 LINE 跳出三則看屋詢問，其中一位說今晚就想看。'}],
   q:'今晚怎麼安排？',
   opts:[
-   {k:'mid',t:'留下來加班，房子的事回家再說。',j:4,e:-10,fb:'回到家已經 11 點，那位買方已讀不回了。',tip:'錯過買方的第一時間，熱度很快就冷掉。'},
+   {k:'mid',t:'留下來加班，房子的事回家再說。',j:4,e:-10,heartAll:-3,fb:'回到家已經 11 點，那位買方已讀不回了。',tip:'錯過買方的第一時間，熱度很快就冷掉。'},
    {k:'mid',t:'準時下班，趕回家帶看。',j:-14,e:-12,fb:'對方看了 10 分鐘就說「再考慮」。主管在群組裡標記你。',tip:'為了一組不確定的買方犧牲工作，常常兩頭落空。'},
    {k:'mid',t:'加班到 9 點，再約對方 10 點看。',e:-20,late:1,fb:'看完房快 11 點，你累到直接在沙發上睡著。',tip:'把帶看塞進下班後，體力會被一天一天榨乾。'}]},
  {id:'key',day:11,scene:'office',who:{sp:'lin',name:'林媽媽',title:'來電'},
@@ -566,44 +732,43 @@ const STEPS=[
   q:'簽約前，貸款的事要怎麼處理？',
   opts:[
    {k:'bad',trap:1,t:'她說沒問題，那就直接簽約吧。',set:'noLoan',fb:'簽約很順利，你總算鬆了一口氣。'},
-   {k:'good',t:'請她先找銀行預審，合約也寫清楚貸款不足時怎麼處理。',e:-8,set:'loanOk',fb:'多跑了兩趟銀行和代書，但心裡踏實多了。',tip:'買方貸款成數沒確認，是交易中途破局最常見的原因之一。'}],
+   {k:'good',t:'請她先找銀行預審，合約也寫清楚貸款不足時怎麼處理。',e:-8,j:-6,set:'loanOk',fb:'多跑了兩趟銀行和代書，但心裡踏實多了。',tip:'買方貸款成數沒確認，是交易中途破局最常見的原因之一。'}],
   post:()=>{if(G.flags.loanOk)G.sold={id:'lin',...G.offers.lin};}},
  {id:'loanfail',day:()=>G.day+1,when:()=>G.flags.linDeal&&G.flags.noLoan,kind:'narr',scene:'night',who:{sp:'lin',name:'林媽媽',title:'貸款卡關'},
   lines:[{t:'銀行估價比成交價低，林媽媽只貸得到六成五，差額拿不出來。'},{who:'林媽媽：',t:'貸款不夠我也沒辦法，那就解約吧！'},
    {t:'你們為了解約條件吵了一個禮拜，你晚上都睡不好。',fx:{e:-18,j:-8,late:1,fight:1}}],
   tip:'簽約前要先確認買方貸款，並約定貸款不足時怎麼處理。房仲成交時會先幫你把關買方的資金。',
   post:()=>{G.flags.linDeal=false;}},
+ {id:'rand2',day:()=>Math.max(12,G.day),kind:'rand'},
+ {id:'law3',day:()=>Math.max(13,G.day),kind:'law',phase:'pre'},
  {id:'tired',day:()=>weekday(Math.max(14,G.day)),scene:'office',who:{sp:'mgr',name:'部門主管',title:'皺眉中'},
   pre:[{t:'連續兩週，下班就趕回家整理房子、回訊息、帶看。今天開會時你打了一個大哈欠，剛好被主管看到。',fx:{j:-6}}],
   q:'今晚你打算……',
   opts:[
    {k:'mid',t:'灌兩杯咖啡，繼續撐。',e:-8,fb:'你撐住了，但半夜心跳很快，怎麼樣都睡不著。',tip:'賣房常常要拖一、兩個月，屋主的體力和本業都是隱形成本。'},
-   {k:'good',t:'請一天假，在家好好睡一覺。',j:-12,e:24,leave:1,fb:'睡飽了，但桌上的工作也堆了一整天。',tip:'賣房常常要拖一、兩個月，屋主的體力和本業都是隱形成本。'},
+   {k:'good',t:'請一天假，在家好好睡一覺。',j:-12,e:20,leave:1,fb:'睡飽了，但桌上的工作也堆了一整天。',tip:'賣房常常要拖一、兩個月，屋主的體力和本業都是隱形成本。'},
    {k:'bad',t:'熬夜把所有買方訊息回完。',e:-16,late:1,fb:'回到凌晨兩點，隔天上班眼睛都睜不開。',tip:'賣房常常要拖一、兩個月，屋主的體力和本業都是隱形成本。'}]},
  {id:'vboss',day:16,when:()=>!G.sold,kind:'view',buyer:'boss'},
  // ---- 成交後：簽約與交屋 ----
  {id:'fees',day:()=>weekday(Math.max(17,G.day)),when:()=>!!G.sold,scene:'office',who:{sp:'doc',name:'買賣契約',title:'簽約前一天'},
-  pre:[{who:'買方：',t:'代書費、規費、契稅，還有這期的房屋稅和地價稅，各自誰付？'}],
+  pre:[{who:'買方：',t:'代書費、規費，還有這期的房屋稅和地價稅，各自誰付？'}],
   q:'你要怎麼回答？',
   opts:[
    {k:'bad',trap:1,t:'隨便啦，到時候再說。',set:'feeVague',fb:'買方皺了皺眉頭，沒再多說什麼。'},
    {k:'good',t:'熬夜查資料，自己列一張費用分擔表。',e:-12,late:1,fb:'查到半夜兩點，總算弄懂哪些該誰付。',tip:'買賣雙方各付哪些費用有慣例，房仲和代書會在簽約前列清楚。'},
    {k:'mid',t:'問問朋友，照朋友說的分。',e:-3,loss:1,lossLabel:'多付了不用你付的規費',fb:'朋友說得不太準，你多付了一筆其實不用你付的錢。',tip:'聽說來的「慣例」不一定對，費用分擔要寫進合約。'}]},
- {id:'feeconseq',day:17,when:()=>!!G.sold&&G.flags.feeVague,kind:'narr',scene:'office',who:{sp:'doc',name:'簽約現場',title:'吵起來了'},
+ {id:'feeconseq',day:()=>G.day,when:()=>!!G.sold&&G.flags.feeVague,kind:'narr',scene:'office',who:{sp:'doc',name:'簽約現場',title:'吵起來了'},
   lines:[{t:'簽約當天，雙方為了幾萬塊的費用吵了兩個小時，差點簽不成。最後你讓步了。',fx:{e:-12,loss:2,lossLabel:'簽約時讓步的費用',fight:1}}],
   tip:'費用分擔沒先講清楚，簽約當天最容易吵起來。'},
- {id:'tax',day:18,when:()=>!!G.sold,scene:'night',who:{sp:'doc',name:'稅單',title:'實拿多少？'},
-  pre:[{t:'簽完約，你開始算實際能拿到多少錢。這才想到：土地增值稅、房地合一稅……'}],
-  q:'稅的事要怎麼處理？',
-  opts:[
-   {k:'bad',trap:1,t:'不用算了，賣多少就拿多少吧。',set:'noTax',fb:'你決定先不管，之後再說。'},
-   {k:'good',t:'請一天假，去問國稅局和代書，把稅算清楚。',j:-12,e:-6,leave:1,fb:'你發現符合條件可以申請自用住宅的優惠稅率，及時準備好文件。',tip:'稅金要事先試算，符合條件的優惠要主動申請。'}]},
+ {id:'calc',day:()=>Math.max(18,G.day),when:()=>!!G.sold,kind:'calc'},
+ {id:'law4',day:()=>weekday(Math.max(19,G.day)),when:()=>!!G.sold,kind:'law',phase:'post'},
  {id:'disclose',day:()=>weekday(Math.max(19,G.day)),when:()=>!!G.sold,scene:'office',who:{sp:'doc',name:'現況說明書',title:'代書請你填'},
   pre:[{t:'代書請你填「不動產現況說明書」。三年前浴室漏過水，後來有修好。'}],
   q:'這件事要寫進去嗎？',
   opts:[
    {k:'bad',trap:1,t:'已經修好了，不用寫吧。',set:'hideLeak',fb:'你在「是否曾經漏水」那一欄勾了「否」。'},
    {k:'good',t:'照實寫，附上當時的修繕紀錄。',e:-4,fb:'買方看了紀錄，反而覺得你很誠實。',tip:'知道的瑕疵要告知，有修繕紀錄更好，交屋後才不會被追究。'}]},
+ {id:'law5',day:()=>Math.max(20,G.day),when:()=>!!G.sold,kind:'law',phase:'post'},
  {id:'handover',day:21,when:()=>!!G.sold,scene:'home',who:{sp:'house',name:'交屋',title:'最後一天'},
   pre:[{t:'交屋前一天，你準備把客廳的冷氣拆下來帶去新家。不過看房時，你好像隨口說過「冷氣可以留下來」。'}],
   q:'冷氣要怎麼處理？',
@@ -613,13 +778,10 @@ const STEPS=[
  {id:'acconseq',day:21,when:()=>!!G.sold&&G.flags.acGone,kind:'narr',scene:'home',who:{sp:'house',name:'交屋現場',title:'卡關'},
   lines:[{who:'買方：',t:'看房時你明明說冷氣會留下來！'},{t:'雙方各說各話，交屋卡了三個小時。最後你自掏腰包買了一台新的裝回去。',fx:{e:-10,loss:3,lossLabel:'補裝一台冷氣',fight:1}}],
   tip:'哪些家具家電要留下，要寫成清單。口頭說過的話最容易起爭執。'},
- {id:'leakconseq',day:21,when:()=>!!G.sold&&G.flags.hideLeak,kind:'narr',scene:'night',who:{sp:'phone',name:'買方',title:'交屋後兩個月'},
-  lines:()=>[{t:'交屋兩個月後，你的手機響了。'},{who:'買方（電話）：',t:'浴室又在滲水了！你之前根本沒說過漏水的事！'},
+ {id:'leakconseq',day:21,when:()=>!!G.sold&&(G.flags.hideLeak||G.flags.windowLeak),kind:'narr',scene:'night',who:{sp:'phone',name:'買方',title:'交屋後兩個月'},
+  lines:()=>[{t:'交屋兩個月後，你的手機響了。'},{who:'買方（電話）：',t:G.flags.windowLeak?'颱風一來，主臥窗邊整片滲水！你之前根本沒說！':'浴室又在滲水了！你之前根本沒說過漏水的事！'},
    {t:'買方認為你隱瞞瑕疵，要求你負擔修繕費用。',fx:{e:-12,loss:Math.max(10,Math.round(G.ask*0.012)),lossLabel:'隱瞞漏水被求償（遊戲估算）',fight:1}}],
-  tip:'知道的瑕疵沒告知，交屋後可能被要求賠償。'},
- {id:'taxconseq',day:21,when:()=>!!G.sold&&G.flags.noTax,kind:'narr',scene:'night',who:{sp:'doc',name:'稅單',title:'來了'},
-  lines:()=>[{t:'稅單寄來，要繳的稅比你想像中多。自用住宅的優惠要在申報時就提出，你錯過了。',fx:{loss:Math.max(8,Math.round(G.ask*0.015)),lossLabel:'錯過稅金優惠（遊戲估算）'}}],
-  tip:'稅金沒事先試算，實拿金額很容易跟想像差一大截。'}
+  tip:'知道的瑕疵沒告知，交屋後可能被要求賠償。'}
 ];
 
 /* ================== 音效（WebAudio 合成） ================== */
@@ -631,11 +793,13 @@ const Snd={ctx:null,on:true,timer:null,seq:null,cur:null,
  sfx(name){if(!this.ctx||!this.on)return;const t=this.ctx.currentTime;
    const S={sel:[[84,.05]],hit:[[72,.06],[79,.06],[84,.1]],crit:[[76,.05],[79,.05],[84,.05],[88,.05],[91,.16]],bad:[[50,.12,'sawtooth'],[45,.2,'sawtooth']],drop:[[67,.08],[62,.08],[55,.14]],
      win:[[72,.1],[76,.1],[79,.1],[84,.3]],lose:[[67,.15],[63,.15],[60,.15],[55,.4]],type:[[96,.015]],fan:[[72,.12],[72,.12],[72,.12],[79,.4],[77,.12],[79,.12],[84,.5]],
-     ring:[[88,.06],[84,.06],[88,.06],[84,.06]],day:[[79,.08],[84,.12]],fight:[[45,.08,'sawtooth'],[52,.08,'sawtooth'],[45,.08,'sawtooth'],[40,.25,'sawtooth']]}[name]||[];
+     ring:[[88,.06],[84,.06],[88,.06],[84,.06]],day:[[79,.08],[84,.12]],fight:[[45,.08,'sawtooth'],[52,.08,'sawtooth'],[45,.08,'sawtooth'],[40,.25,'sawtooth']],
+     right:[[76,.08],[84,.16]],wrong:[[52,.14,'sawtooth'],[47,.24,'sawtooth']]}[name]||[];
    let tt=t;S.forEach(([m,d,ty])=>{this.tone(m,tt,d+.02,ty||'square',name==='type'?.018:.06);tt+=d;});},
  songs:{
   title:{bpm:132,mel:[72,1,76,1,79,1,84,2,79,1,81,2,79,1,76,1,77,1,79,2,0,1,72,1,76,1,79,1,84,2,86,1,84,2,79,1,76,1,74,1,72,3],bas:[48,2,48,2,53,2,55,2,48,2,48,2,53,2,55,2]},
   day:{bpm:112,mel:[67,2,72,1,74,1,76,2,74,2,72,2,69,2,67,4,65,2,69,1,72,1,74,2,72,2,71,2,67,2,72,4],bas:[48,4,45,4,41,4,43,4]},
+  quiz:{bpm:124,mel:[69,1,0,1,69,1,72,1,71,2,67,2,69,1,0,1,69,1,72,1,74,2,71,2],bas:[45,2,52,2,45,2,52,2,43,2,50,2,43,2,50,2]},
   battle:{bpm:158,mel:[69,1,72,1,76,1,72,1,74,1,71,1,67,1,71,1,69,1,72,1,76,1,79,1,77,2,76,2,74,1,72,1,71,1,74,1,72,1,69,1,71,1,68,1,69,4],bas:[45,2,45,2,43,2,43,2,41,2,41,2,40,2,40,2]},
   boss:{bpm:170,mel:[64,1,64,1,71,1,64,1,72,1,64,1,71,1,69,1,64,1,64,1,71,1,64,1,74,1,72,1,71,1,67,1],bas:[40,1,40,1,52,1,40,1,40,1,52,1,40,1,51,1]}},
  play(name){if(this.cur===name&&this.seq)return;this.stop();this.cur=name;if(!this.ctx||!this.on)return;const s=this.songs[name];const step=60/s.bpm/2;
@@ -654,13 +818,20 @@ function renderSndBtns(){document.querySelectorAll('.snd-btn').forEach(b=>{b.tex
 /* ================== 狀態與工具 ================== */
 const $=s=>document.querySelector(s);
 const RM=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
-let G={};
-function newGame(){G={ask:G.ask||1200,type:G.type||'大樓',day:1,E:100,J:100,kit:2,flags:{},heartMod:{},offers:{},sold:null,linDay:11,si:0,
-  stats:{leave:0,late:0,views:0,fights:0,traps:0},picks:[],losses:[],busy:false,end:null};}
-newGame();
 const fmt=n=>Math.round(n).toLocaleString('zh-TW');
+const fmtW=n=>{const a=Math.abs(n);return a<10?String(+a.toFixed(1)):fmt(a);};
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;};
+const ri=n=>Math.random()*n|0;
+let G={};
+function newGame(){
+  const pre=shuffle(LAW.filter(q=>q.phase==='pre'));const post=shuffle(LAW.filter(q=>q.phase==='post'));
+  G={ask:G.ask||1200,type:G.type||'大樓',day:1,E:100,J:100,kit:HARD.kit,flags:{},heartMod:{},heartAll:0,base:100,offers:{},sold:null,linDay:11,si:0,
+    v:{ad:ri(AD_VARIANTS.length),calls:ri(CALLS_VARIANTS.length)},
+    lawPre:pre,lawPost:post.concat(pre.slice(3)),annoy:shuffle(ANNOY),
+    stats:{leave:0,late:0,views:0,fights:0,traps:0,quiz:0,quizOk:0},picks:[],losses:[],busy:false,end:null};
+}
+newGame();
 function show(id){document.querySelectorAll('.scr').forEach(s=>s.hidden=(s.id!==id));}
 
 /* ---------- 對話框 ---------- */
@@ -702,6 +873,7 @@ function floatTxt(cls,text,x,y){const s=document.createElement('span');s.classNa
   s.style.top=`calc(${y} + ${(floatN++%3)*18}px)`;$('#arena').appendChild(s);setTimeout(()=>s.remove(),1350);}
 function banner(text,red){const b=document.createElement('div');b.className='crit-banner'+(red?' red':'');b.textContent=text;$('#arena').appendChild(b);setTimeout(()=>b.remove(),1000);}
 function shakeEl(el){if(RM)return;el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');}
+function lossAmt(fx){return fx.lossPct?Math.max(2,Math.round(G.ask*fx.lossPct/100)):fx.loss;}
 function applyFx(fx){
   if(!fx)return;
   if(fx.e){G.E=clamp(G.E+fx.e,0,100);floatTxt(fx.e>0?'ok':'down',`體力 ${fx.e>0?'+':''}${fx.e}`,'6%','46%');}
@@ -709,28 +881,39 @@ function applyFx(fx){
   if(fx.leave)G.stats.leave+=fx.leave;
   if(fx.late)G.stats.late+=fx.late;
   if(fx.fight){G.stats.fights+=fx.fight;banner('起衝突了！',true);Snd.sfx('fight');shakeEl($('#arena'));}
-  if(fx.loss){G.losses.push({label:fx.lossLabel||'額外支出',amt:fx.loss});floatTxt('down',`-${fx.loss}萬`,'30%','20%');}
+  const la=lossAmt(fx);if(la){G.losses.push({label:fx.lossLabel||'額外支出',amt:la});floatTxt('down',`-${fmtW(la)}萬`,'30%','20%');}
   if(fx.set)[].concat(fx.set).forEach(f=>G.flags[f]=true);
   if(fx.heart)for(const k in fx.heart)G.heartMod[k]=(G.heartMod[k]||0)+fx.heart[k];
+  if(fx.heartAll)G.heartAll+=fx.heartAll;
+  if(fx.base)G.base=Math.max(70,G.base+fx.base);
   if(fx.linDay)G.linDay=fx.linDay;
   updateBars();
 }
+// 選完之後才揭曉的影響
+function fxParts(fx){const a=[];if(!fx)return a;
+  if(fx.e)a.push(`體力 ${fx.e>0?'+':''}${fx.e}`);if(fx.j)a.push(`工作 ${fx.j>0?'+':''}${fx.j}`);
+  if(fx.leave)a.push(`請假 ${fx.leave} 天`);if(fx.late)a.push('熬夜');
+  const la=lossAmt(fx);if(la)a.push(`損失 ${fmtW(la)} 萬`);
+  if(fx.base)a.push(`開價 ${fx.base}%`);if(fx.fight)a.push('起衝突');
+  if(fx.heartAll||fx.heart)a.push('買方熱度下降');
+  return a;}
 function hidePanels(){$('#choices').hidden=true;$('#timing').hidden=true;$('#next-row').hidden=true;$('#tip').hidden=true;renderKit();}
-function showTip(tag,text){const t=$('#tip');t.innerHTML='';if(!text){t.hidden=true;return;}const b=document.createElement('b');b.textContent=tag;t.append(b,' '+text);t.hidden=false;}
+function showTip(rows){const t=$('#tip');t.innerHTML='';rows=rows.filter(r=>r&&r[1]);if(!rows.length){t.hidden=true;return;}
+  rows.forEach(([tag,text,cls])=>{const p=document.createElement('div');p.className=cls||'';const b=document.createElement('b');b.textContent=tag;p.append(b,' '+text);t.appendChild(p);});t.hidden=false;}
+function fxRow(parts){return ['影響：',parts.length?parts.join('｜'):'暫時看不出有什麼影響……','fx'];}
 function nextBtn(label,fn){$('#next-btn').textContent=label;$('#next-row').hidden=false;G.after=fn;G.busy=false;$('#next-btn').focus({preventScroll:true});}
 $('#next-btn').addEventListener('click',()=>{if(!G.after)return;Snd.sfx('sel');const f=G.after;G.after=null;$('#next-row').hidden=true;f();});
-function costText(o){const a=[];if(o.e)a.push(`體力 ${o.e>0?'+':''}${o.e}`);if(o.j)a.push(`工作 ${o.j>0?'+':''}${o.j}`);if(o.leave)a.push(`請假 ${o.leave} 天`);return a.join('・');}
-function showChoices(opts,onPick,showCost){
+function showChoices(opts,onPick){
   const box=$('#choices');box.innerHTML='';G.curOpts=shuffle(opts);
   G.curOpts.forEach(o=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=o.t;
-    const c=showCost&&costText(o);if(c){const s=document.createElement('span');s.className='cost';s.textContent=c;b.appendChild(s);}
     b.addEventListener('click',()=>{if(G.busy)return;G.busy=true;Snd.sfx('sel');box.hidden=true;renderKit();onPick(o);});box.appendChild(b);});
   box.hidden=false;G.busy=false;renderKit();
 }
+const isGood=o=>o.k==='good'||o.ok;
 function renderKit(){const b=$('#kit-btn');b.textContent='求救 Ryan ×'+G.kit;
-  b.disabled=G.kit<=0||$('#choices').hidden||!(G.curOpts||[]).some(o=>o.k==='good');}
+  b.disabled=G.kit<=0||$('#choices').hidden||!(G.curOpts||[]).some(isGood);}
 $('#kit-btn').addEventListener('click',()=>{if(G.kit<=0||$('#choices').hidden)return;
-  const btns=[...document.querySelectorAll('#choices .opt')];const gi=(G.curOpts||[]).findIndex(o=>o.k==='good');
+  const btns=[...document.querySelectorAll('#choices .opt')];const gi=(G.curOpts||[]).findIndex(isGood);
   if(gi<0||btns[gi].classList.contains('kit'))return;G.kit--;btns[gi].classList.add('kit');Snd.sfx('ring');renderKit();
   $('#d-who').textContent='Ryan（電話）：';$('#d-txt').textContent='這題我會這樣處理，你參考看看。';});
 
@@ -740,9 +923,9 @@ function overlay(html,btnText,cb){const ov=$('#overlay'),box=$('#ov-box');box.in
   b.focus({preventScroll:true});b.addEventListener('click',()=>{Snd.sfx('sel');ov.hidden=true;cb();},{once:true});}
 function calHtml(){let s='<div class="cal" aria-hidden="true">';for(let d=1;d<=CONFIG.days;d++)s+=`<span class="${d<G.day?'past':d===G.day?'today':''}">${d}</span>`;return s+'</div>';}
 function dayCard(nights,cb){
-  const gain=Math.min(100-G.E,nights*3);G.E+=gain;updateBars();updateHud();Snd.sfx('day');
+  const gain=Math.min(100-G.E,nights*HARD.regen);G.E+=gain;updateBars();updateHud();Snd.sfx('day');
   overlay(`<div class="ov-k">週${DOW[(G.day-1)%7]}</div><div class="day-big">DAY ${G.day}</div>${calHtml()}
-    <p class="ov-p">${gain>0?`睡了 ${nights} 晚，體力恢復 ${gain}`:'沒時間休息，直接開始'}</p>`,'繼續',cb);
+    <p class="ov-p">${gain>0?`睡了 ${nights} 晚，體力只恢復 ${gain}`:'沒時間休息，直接開始'}</p>`,'繼續',cb);
 }
 
 /* ================== 流程引擎 ================== */
@@ -751,21 +934,28 @@ function run(){
   if(G.E<=0)return finish('collapse');if(G.J<=0)return finish('job');
   while(G.si<STEPS.length&&STEPS[G.si].when&&!STEPS[G.si].when())G.si++;
   if(G.si>=STEPS.length)return finish(G.sold?'sold':'unsold');
-  const s=STEPS[G.si];const d=Math.max(dayOf(s),G.day);
+  const s=STEPS[G.si];const d=Math.min(CONFIG.days,Math.max(dayOf(s),G.day));
   hidePanels();
   if(d>G.day){const n=d-G.day;G.day=d;dayCard(n,()=>exec(s));}else exec(s);
 }
 function nextStep(){G.si++;run();}
-function exec(s){
+function exec(s0){
   updateHud();
-  if(s.kind==='view')return startView(s.buyer);
+  if(s0.kind==='view')return startView(s0.buyer);
+  if(s0.kind==='law')return runLaw(s0);
+  if(s0.kind==='calc')return runCalc();
+  let s=s0;
+  if(s0.kind==='rand'){const a=G.annoy.shift();s={...a,pre:[{t:a.pre,fx:a.fx0}]};}
+  else if(s0.variant)s={...s0,...s0.variant(),pre:[...(s0.pre||[]),...((s0.variant().pre)||[])]};
   Snd.play('day');
   setScene(s.scene,s.who,false);G.heart=null;G.pct=null;updateBars();
   setHudTitle(s.who?s.who.title:'');
   if(s.who&&s.who.sp==='phone')Snd.sfx('ring');
   if(s.kind==='narr'){
     const lines=typeof s.lines==='function'?s.lines():s.lines;
-    sayLines(lines,()=>{const tip=typeof s.tip==='function'?s.tip():s.tip;if(tip){showTip('提醒：',tip);G.picks.push({k:'conseq',tip});}
+    sayLines(lines,()=>{const tip=typeof s.tip==='function'?s.tip():s.tip;
+      const parts=[];lines.forEach(L=>parts.push(...fxParts(L.fx)));
+      showTip([fxRow(parts),['提醒：',tip]]);if(tip)G.picks.push({k:'conseq',tip});
       nextBtn('繼續 ▶',()=>{s.post&&s.post();nextStep();});});
     return;
   }
@@ -774,24 +964,76 @@ function exec(s){
     applyFx(o);
     const fb=typeof o.fb==='string'?{t:o.fb}:o.fb;
     say(fb.who||'',fb.t,()=>{
-      if(o.tip){showTip(o.k==='good'?'好判斷：':'提醒：',o.tip);G.picks.push({k:o.k,tip:o.tip});}
+      showTip([fxRow(fxParts(o)),[o.k==='good'?'好判斷：':'提醒：',o.trap?'':o.tip]]);
+      if(o.tip&&!o.trap)G.picks.push({k:o.k,tip:o.tip});
       nextBtn('繼續 ▶',()=>{s.post&&s.post();nextStep();});
     });
-  },true));
+  }));
+}
+
+/* ---------- 法規題 ---------- */
+function runLaw(s){
+  const pool=s.phase==='post'?G.lawPost:G.lawPre;const Q=pool.shift();
+  if(!Q)return nextStep();
+  G.stats.quiz++;Snd.play('quiz');
+  setScene(Q.who.sp==='calc'||Q.who.sp==='doc'?'office':'home',Q.who,false);G.heart=null;G.pct=null;updateBars();
+  setHudTitle(Q.who.title);
+  sayLines([{who:Q.who.name+'：',t:Q.q}],()=>showChoices(Q.opts,o=>{
+    if(o.ok){G.stats.quizOk++;Snd.sfx('right');banner('答對了！');const fx={e:-3};applyFx(fx);
+      say('','你答對了，但查資料也花了不少時間。',()=>{showTip([fxRow(fxParts(fx)),['解說：',Q.explain]]);nextBtn('繼續 ▶',nextStep);});}
+    else{G.stats.traps++;Snd.sfx('wrong');banner('答錯了…',true);applyFx(Q.wrong.fx);
+      G.picks.push({k:'law',tip:Q.explain});
+      say('',Q.wrong.fb,()=>{showTip([fxRow(fxParts(Q.wrong.fx)),['正確答案：',Q.opts.find(x=>x.ok).t],['解說：',Q.explain]]);nextBtn('繼續 ▶',nextStep);});}
+  }));
+}
+
+/* ---------- 稅務計算題（數字每局不同） ---------- */
+function taxOf(P,B,y,self){const exp=Math.min(P*0.03,30);const gain=P-B-exp;
+  if(self)return Math.max(0,gain-400)*0.10;const r=y<=2?.45:y<=5?.35:y<=10?.20:.15;return Math.max(0,gain)*r;}
+function runCalc(){
+  const P=Math.round(G.sold.price);
+  const cases=[{y:1.5,self:false},{y:4,self:false},{y:7,self:false},{y:8,self:true},{y:12,self:false}];
+  const c=cases[ri(cases.length)];
+  const B=Math.round(P*(0.55+Math.random()*0.2)/10)*10;
+  const right=taxOf(P,B,c.y,c.self);
+  const rate=c.y<=2?.45:c.y<=5?.35:c.y<=10?.20:.15;const exp=Math.min(P*0.03,30);
+  const cands=[(P-B)*(c.self?0.10:rate),c.self?(P-B-exp)*0.10:(P-B-exp)*(rate===.45?.35:rate===.35?.20:.45),c.self?(P-B-exp)*0.20:Math.max(0,P-B-exp-400)*0.10,(P-B-exp)*0.15,(P-B)*0.20];
+  const opts=[{v:right,ok:1}];
+  for(const v of cands){if(opts.length>=4)break;if(opts.every(o=>Math.abs(o.v-v)>=1))opts.push({v});}
+  opts.forEach(o=>o.t=`約 ${(Math.round(o.v*10)/10).toLocaleString('zh-TW')} 萬`);
+  G.stats.quiz++;Snd.play('quiz');
+  setScene('night',{sp:'calc',name:'房地合一稅',title:'自己算'},false);G.heart=null;G.pct=null;updateBars();setHudTitle('稅務試算');
+  const yt=c.y===1.5?'1 年半':c.y+' 年';
+  const cond=c.self?'你和家人一直設籍自住，持有並居住滿 6 年，也沒出租過，符合自住優惠':'不符合自住優惠';
+  const lines=[{t:'過戶前，你要自己試算房地合一稅。'},
+    {who:'題目：',t:`成交價 ${fmt(P)} 萬，當初買價 ${fmt(B)} 萬，持有 ${yt}，${cond}。找不到費用收據，土地漲價總數額假設為 0。應繳多少？`}];
+  sayLines(lines,()=>showChoices(opts,o=>{
+    const breakdown=`成交價 ${fmt(P)} − 買價 ${fmt(B)} − 費用 ${fmtW(exp)}（成交價 3%，上限 30 萬）＝ 所得 ${fmtW(P-B-exp)} 萬。`+
+      (c.self?`自住優惠：400 萬以內免稅，超過部分 10%。`:`持有 ${yt} 稅率 ${rate*100}%。`)+`應繳約 ${fmtW(right)} 萬。`;
+    if(o.ok){G.stats.quizOk++;Snd.sfx('right');banner('算對了！');const fx={e:-6,late:1};applyFx(fx);
+      say('','你算對了，不過算到半夜一點。',()=>{showTip([fxRow(fxParts(fx)),['算法：',breakdown]]);nextBtn('繼續 ▶',nextStep);});}
+    else{G.stats.traps++;Snd.sfx('wrong');banner('算錯了…',true);
+      const diff=Math.abs(o.v-right);const under=o.v<right;
+      const fx=under?{loss:Math.max(1,Math.round(diff*1.2*10)/10),lossLabel:'房地合一稅少報，補稅加罰鍰',j:-8}:{loss:Math.max(1,Math.round(diff*10)/10),lossLabel:'房地合一稅算錯，多繳的稅'};
+      applyFx(fx);G.picks.push({k:'law',tip:'房地合一稅：成交價減買價、費用（無收據按 3%，上限 30 萬）和土地漲價總數額，再依持有年限或自住優惠計稅。'});
+      say('',under?'你少報了，國稅局通知你補稅，還要加罰鍰。':'你多算了，白白多繳一筆稅，申請退還還要再跑一趟。',()=>{
+        showTip([fxRow(fxParts(fx)),['正確算法：',breakdown]]);nextBtn('繼續 ▶',nextStep);});}
+  }));
 }
 
 /* ================== 帶看（戰鬥） ================== */
 function startView(id){
-  const B=BUYERS[id];G.cur=id;G.heart=clamp(B.start+(G.heartMod[id]||0),5,95);G.pct=100;G.round=0;G.stats.views++;
-  G.rounds=B.rounds.slice();if(id==='wang'&&G.flags.adFake)G.rounds.splice(1,0,AD_ROUND);
+  const B=BUYERS[id];G.cur=id;G.heart=clamp(B.start+(G.heartMod[id]||0)+G.heartAll,5,95);G.pct=G.base;G.round=0;G.stats.views++;
+  G.rounds=shuffle(B.pool).slice(0,B.pick);if(B.final)G.rounds.push(B.final);
+  if(id==='wang'&&G.flags.adFake)G.rounds.splice(1,0,AD_VARIANTS[G.v.ad].round);
   setScene('home',{sp:id,name:B.name,title:B.title},true);setHudTitle('帶看 '+B.name);updateBars();
   Snd.play(id==='boss'?'boss':'battle');
   overlay(`<div class="ov-k">${id==='boss'?'BOSS':'帶看'}</div><canvas id="ov-cv" class="px slide-in"></canvas>
-    <div class="ov-h">${B.title} ${B.name}<br>來看房了！</div><p class="ov-p">${B.intro}</p><p class="ov-p" style="color:var(--mute);font-size:13px">看屋時被挑剔，回話太衝可能起衝突。你越累，越容易失控。</p>`,'開門迎接',()=>{
-    applyFx({e:-5});floatTxt('gold','打掃家裡','6%','30%');
+    <div class="ov-h">${B.title} ${B.name}<br>來看房了！</div><p class="ov-p">${B.intro}</p><p class="ov-p" style="color:var(--mute);font-size:13px">意願要衝到 ${HARD.dealAt} 以上才會成交。被挑剔時回話太衝會起衝突，你越累越容易失控。</p>`,'開門迎接',()=>{
+    applyFx({e:HARD.viewCost});floatTxt('gold','打掃家裡','6%','30%');
     if(id==='boss'&&G.flags.floor){
-      sayLines([{who:'黑董：',t:'我聽說你電話裡講過九折可以談。那我們就從那裡開始吧。'}],()=>{G.pct=95;floatTxt('down',`-${fmt(G.ask*.05)}萬`,'6%','30%');updateBars();
-        showTip('提醒：','電話裡隨口說的底價，已經傳到別的買方耳裡了。');G.picks.push({k:'conseq',tip:'底價一說出口就收不回來，消息還可能傳到其他買方耳裡。'});
+      sayLines([{who:'黑董：',t:'我聽說你講過九折可以談。那我們就從那裡開始吧。'}],()=>{G.pct-=5;floatTxt('down',`-${fmt(G.ask*.05)}萬`,'6%','30%');updateBars();
+        showTip([['影響：','價格 -5%'],['提醒：','你說出去的底價，已經傳到別的買方耳裡了。']]);G.picks.push({k:'conseq',tip:'底價一說出口就收不回來，消息還可能傳到其他買方耳裡。'});
         nextBtn('開始談 ▶',viewRound);});
     }else viewRound();
   });
@@ -801,32 +1043,31 @@ function viewRound(){
   const B=BUYERS[G.cur],R=G.rounds[G.round];hidePanels();
   setHudTitle(`帶看 ${B.name}・${G.round+1}/${G.rounds.length}`);
   shakeEl($('#npc-cv'));
-  say(B.name+'：',R.say,()=>showChoices(R.opts,o=>pickView(o,R),false));
+  say(B.name+'：',R.say,()=>showChoices(R.opts,o=>pickView(o,R)));
 }
 let tAnim=null,tAuto=null;
 function pickView(o,R){
   G.pending={o,R};
   if(RM){return resolveView(o,R,1,'good');}
   $('#timing').hidden=false;const nd=$('#needle');const t0=performance.now();
-  const speed=1/(G.cur==='boss'?0.6:0.78)*(G.E<40?1.25:1);
+  const speed=1/(G.cur==='boss'?0.52:0.66)*(G.E<40?1.3:1);
   const loop=now=>{const x=((now-t0)/1000*speed)%2;const pos=x<1?x:2-x;G.tpos=pos;nd.style.left=(pos*100)+'%';tAnim=requestAnimationFrame(loop);};
-  tAnim=requestAnimationFrame(loop);clearTimeout(tAuto);tAuto=setTimeout(fire,4500);
+  tAnim=requestAnimationFrame(loop);clearTimeout(tAuto);tAuto=setTimeout(fire,4000);
   $('#fire-btn').focus({preventScroll:true});
 }
 function fire(){
   if($('#timing').hidden)return;cancelAnimationFrame(tAnim);clearTimeout(tAuto);
-  const d=Math.abs((G.tpos??.5)-.5);const zone=d<.08?'perfect':d<.22?'good':'miss';const m=zone==='perfect'?1.5:zone==='good'?1:.75;
+  const d=Math.abs((G.tpos??.5)-.5);const zone=d<.06?'perfect':d<.18?'good':'miss';const m=zone==='perfect'?1.4:zone==='good'?1:.7;
   $('#timing').hidden=true;setTimeout(()=>resolveView(G.pending.o,G.pending.R,m,zone),150);
 }
 $('#fire-btn').addEventListener('click',fire);$('#tbar').addEventListener('click',fire);
 function resolveView(o,R,m,zone){
   const B=BUYERS[G.cur];
   let h=o.h,p=o.p;
-  if(h>0)h=Math.round(h*m);else h=Math.round(h*(zone==='perfect'?.6:zone==='miss'?1.2:1));
-  if(p<0)p=zone==='perfect'?p*.5:zone==='miss'?p*1.3:p;p=Math.round(p*10)/10;
-  // 衝突判定：看屋挑剔的回合，屋主越累越容易起衝突
+  if(h>0)h=Math.round(h*m*(0.75+Math.random()*0.4));else h=Math.round(h*(zone==='perfect'?.6:zone==='miss'?1.2:1));
+  if(p<0)p=zone==='perfect'?p*.6:zone==='miss'?p*1.3:p;p=Math.round(p*10)/10;
   let conflict=false;
-  if(R.type==='view'){const base={good:0,mid:.06,bad:.5}[o.k];const pc=base+(100-G.E)/100*(o.k==='good'?.18:.4);conflict=Math.random()<pc;}
+  if(R.type==='view'){const base={good:0,mid:.1,bad:.6}[o.k];const pc=base+(100-G.E)/100*(o.k==='good'?.22:.45);conflict=Math.random()<pc;}
   if(conflict)h-=20;
   G.heart=clamp(G.heart+h,0,100);G.pct=Math.max(50,+(G.pct+p).toFixed(1));
   G.picks.push({k:o.k,tip:o.tip});
@@ -835,11 +1076,12 @@ function resolveView(o,R,m,zone){
   else{Snd.sfx('bad');shakeEl($('#arena'));floatTxt('down','意願 '+h,'56%','8%');}
   if(p<0)setTimeout(()=>{Snd.sfx('drop');floatTxt('down',`-${fmt(-p*G.ask/100)}萬`,'6%','40%');},300);
   updateBars();
+  const parts=[`意願 ${h>0?'+':''}${h}`];if(p<0)parts.push(`價格 -${fmt(-p*G.ask/100)} 萬`);if(conflict)parts.push('體力 -8','起衝突');
   setTimeout(()=>{
     const lines=conflict?[{who:'你：',t:o.k==='good'?'（你太累了，語氣不小心衝了一點……）':'（你忍不住提高了音量）',fx:{e:-8,fight:1}},{who:B.name+'：',t:B.angry}]:[{who:B.name+'：',t:o.fb}];
     sayLines(lines,()=>{
       const tag=conflict?'起衝突：':o.k==='good'?'好招！':o.k==='mid'?'價格失守：':'踩到地雷：';
-      showTip(tag,conflict?(G.E<50?'你已經很累了，被挑剔時特別容易失控。賣房拖越久，屋主的情緒越難顧。':o.tip):o.tip);
+      showTip([fxRow(parts),[tag,conflict?(G.E<50?'你已經很累了，被挑剔時特別容易失控。賣房拖越久，屋主的情緒越難顧。':o.tip):o.tip]]);
       if(conflict)G.picks.push({k:'conseq',tip:'帶看時被挑剔很正常。屋主越累越容易跟買方吵起來，一吵，買方就走了。'});
       G.round++;
       const end=G.heart>=100||G.heart<=0||G.round>=G.rounds.length;
@@ -849,7 +1091,7 @@ function resolveView(o,R,m,zone){
 }
 function endView(){
   const B=BUYERS[G.cur],id=G.cur;hidePanels();
-  const deal=G.heart>=60;const price=G.ask*G.pct/100;
+  const deal=G.heart>=HARD.dealAt;const price=G.ask*G.pct/100;
   if(G.E<=0||G.J<=0){return run();}
   if(deal){
     G.offers[id]={pct:G.pct,price,name:B.name};
@@ -857,12 +1099,12 @@ function endView(){
     Snd.sfx('win');
     overlay(`<div class="ov-k">${id==='boss'?'DEAL!':'GOOD!'}</div><canvas id="ov-cv" class="px"></canvas><div class="ov-h">${B.name}說想買！</div>
       <div class="ov-big"><span class="num">${fmt(price)}</span> 萬</div>
-      <p class="ov-p">守住開價的 ${G.pct}%。${id==='boss'?'接下來是簽約和交屋，自己來。':'不過，事情還沒結束……'}</p>`,'繼續',()=>{G.heart=null;nextStep();});
+      <p class="ov-p">守住開價的 ${G.pct}%。${id==='boss'?'接下來是簽約、報稅和交屋，全部自己來。':'不過，事情還沒結束……'}</p>`,'繼續',()=>{G.heart=null;nextStep();});
     drawSprite($('#ov-cv'),SPR[id]);
   }else{
     Snd.sfx('lose');
     overlay(`<div class="ov-k">BUYER LEFT</div><canvas id="ov-cv" class="px" style="opacity:.6;transform:scaleX(-1)"></canvas><div class="ov-h">${B.name}走了……</div>
-      <p class="ov-p">${G.heart<=0?'買方被你嚇跑了。真心想買的人，可能就這樣錯過。':'聊完一輪，對方還是沒心動，決定再看看別間。'}</p>`,'繼續',()=>{G.heart=null;nextStep();});
+      <p class="ov-p">${G.heart<=0?'買方被你嚇跑了。真心想買的人，可能就這樣錯過。':`意願只到 ${G.heart}，對方決定再看看別間。`}</p>`,'繼續',()=>{G.heart=null;nextStep();});
     drawSprite($('#ov-cv'),SPR[id]);
   }
 }
@@ -882,10 +1124,10 @@ function finish(reason){
 function computeResult(){
   const S=G.stats,sold=G.sold;const lossSum=G.losses.reduce((a,l)=>a+l.amt,0);
   let score=0;if(sold){score+=30+clamp((sold.pct-85)/15,0,1)*20;}
-  score+=G.E/100*15+G.J/100*15-S.traps*5-S.fights*3;
-  let g=score>=62?'S':score>=48?'A':score>=34?'B':score>=20?'C':'D';
+  score+=G.E/100*15+G.J/100*15-S.traps*4-S.fights*3;
+  let g=score>=70?'S':score>=55?'A':score>=40?'B':score>=22?'C':'D';
   if(!sold&&(g==='S'||g==='A'||g==='B'))g='C';
-  const T={S:['自售高手','房子賣了，工作也顧住了。不過你應該最清楚，這 21 天有多累。'],A:['硬撐過關','成交了，但體力和工作都被扣了不少分。'],
+  const T={S:['自售高手','房子賣了，工作也顧住了。不過你應該最清楚，這 21 天有多累。'],A:['硬撐過關','成交了，但體力、工作和荷包都被扣了不少。'],
     B:['蠟燭兩頭燒','房子和工作兩頭跑，好幾次差點撐不住。'],C:['心力交瘁','踩了不少雷，錢和力氣都花在不該花的地方。'],D:['白忙一場','三組買方都沒談成，房子還掛在網路上，人也累壞了。']};
   let [title,desc]=T[g];
   if(G.end==='collapse'){title='累倒在半路';desc='身體先撐不住了。自己賣房，最先被消耗的是你自己。';}
@@ -901,6 +1143,8 @@ function showResult(){
   if(R.sold){h+=statHtml('成交價',`<span class="num">${fmt(R.sold.price)}</span> 萬`);h+=statHtml('守住開價',`<span class="num">${R.sold.pct}</span>%`);
     h+=statHtml('扣掉糾紛和失誤，實拿約',`<span class="num">${fmt(R.sold.price-R.lossSum)}</span> 萬`,'wide');}
   else h+=statHtml('結果','房子沒賣出去','wide bad');
+  h+=statHtml('稅務法規題',`<span class="num">${S.quizOk}/${S.quiz}</span> 答對`,S.quizOk<S.quiz?'bad':'');
+  h+=statHtml('踩到的雷',`<span class="num">${S.traps}</span> 個`,S.traps?'bad':'');
   h+=statHtml('請假',`<span class="num">${S.leave}</span> 天`,S.leave>=2?'bad':'');
   h+=statHtml('熬夜',`<span class="num">${S.late}</span> 次`,S.late>=2?'bad':'');
   h+=statHtml('親自帶看',`<span class="num">${S.views}</span> 組`);
@@ -909,10 +1153,10 @@ function showResult(){
   h+=statHtml('工作表現',`<span class="num">${G.J}</span>`,G.J<50?'bad':'');
   $('#r-stats').innerHTML=h;
   const lw=$('#r-loss-wrap');
-  if(G.losses.length){lw.hidden=false;$('#r-loss').innerHTML=G.losses.map(l=>`<div class="loss"><span>${l.label}</span><span class="r">-${l.amt<10?(+l.amt.toFixed(1)):fmt(l.amt)} 萬</span></div>`).join('');}
+  if(G.losses.length){lw.hidden=false;$('#r-loss').innerHTML=G.losses.map(l=>`<div class="loss"><span>${l.label}</span><span class="r">-${fmtW(l.amt)} 萬</span></div>`).join('');}
   else lw.hidden=true;
-  const order={conseq:0,bad:1,mid:2};const seen=new Set();const ls=[];
-  G.picks.filter(p=>p.k!=='good').sort((a,b)=>order[a.k]-order[b.k]).forEach(p=>{if(!seen.has(p.tip)&&ls.length<4){seen.add(p.tip);ls.push(p.tip);}});
+  const order={law:0,conseq:1,bad:2,mid:3};const seen=new Set();const ls=[];
+  G.picks.filter(p=>p.k!=='good').sort((a,b)=>order[a.k]-order[b.k]).forEach(p=>{if(!seen.has(p.tip)&&ls.length<5){seen.add(p.tip);ls.push(p.tip);}});
   $('#r-lessons').innerHTML='';
   if(ls.length)ls.forEach(t=>{const li=document.createElement('li');li.textContent=t;$('#r-lessons').appendChild(li);});
   else{const li=document.createElement('li');li.textContent='幾乎零失誤！不過你也看到了，做對每件事要花多少假和體力。';$('#r-lessons').appendChild(li);}
@@ -986,10 +1230,10 @@ document.querySelectorAll('#type-chips .chip').forEach(c=>c.addEventListener('cl
 $('#go-btn').addEventListener('click',()=>{
   Snd.sfx('sel');newGame();show('scr-play');setScene('home',null,false);updateBars();updateHud();setHudTitle('出發');
   overlay(`<div class="ov-k">MISSION</div><canvas id="ov-cv" class="px"></canvas><div class="ov-h">不找仲介，自己賣！</div>
-    <p class="ov-p">你白天還要上班。21 天內把房子賣掉，同時別把身體和工作搞垮。</p>
+    <p class="ov-p">你白天還要上班。21 天內把房子賣掉，同時別把身體和工作搞垮。選項不會告訴你後果，選了才知道。</p>
     <div class="ov-legend"><div><i style="background:var(--mint)"></i><span><b>體力</b>：帶看、熬夜、吵架都會消耗。歸零就累倒。</span></div>
     <div><i style="background:#5d8fe0"></i><span><b>工作</b>：請假、分心會扣分。歸零主管就約談你。</span></div>
-    <div><i style="background:var(--gold)"></i><span><b>求救 Ryan</b>：卡關時打給 Ryan，共 2 次。</span></div></div>`,'開始第 1 天',run);
+    <div><i style="background:var(--gold)"></i><span><b>求救 Ryan</b>：卡關時打給 Ryan，只有 1 次。</span></div></div>`,'開始第 1 天',run);
   drawSprite($('#ov-cv'),SPR.me);
 });
 $('#copy-btn').addEventListener('click',async()=>{const b=$('#copy-btn');
