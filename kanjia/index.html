@@ -1,0 +1,1007 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="不找仲介自己賣房子，白天上班、晚上帶看，21 天你撐得住嗎？"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>殺價魔王大作戰</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&family=Press+Start+2P&display=swap">
+<style>
+/* layout: one-screen handheld console — pixel scene on top, RPG dialog box below; single deliberate night look */
+:root{
+  --night:#0A1428; --navy:#114F9C; --navy-2:#0C3366; --gold:#F4CD3B; --gold-d:#A9851A;
+  --paper:#F7F0DC; --paper-2:#E9DFC3; --ink:#0A1428; --red:#E5483B; --mint:#4FD39C; --rose:#FF8FB1; --mute:#93A6CB;
+  --f-pix:"Press Start 2P", ui-monospace, monospace;
+  --f-zh:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--night);color:var(--paper);font-family:var(--f-zh);font-size:16px;line-height:1.55;-webkit-tap-highlight-color:transparent;overflow:hidden}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+canvas.px{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+.num{font-family:var(--f-pix);font-variant-numeric:tabular-nums;letter-spacing:0}
+
+#app{height:100%;max-width:480px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px;display:flex;flex-direction:column;position:relative}
+.scr{flex:1;min-height:0;display:flex;flex-direction:column}
+
+.btn{border:3px solid var(--ink);background:var(--gold);color:var(--ink);font-weight:900;font-size:18px;padding:12px 18px;box-shadow:0 5px 0 var(--gold-d),0 5px 0 3px var(--ink);transition:transform .06s;letter-spacing:.06em}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--gold-d),0 1px 0 3px var(--ink)}
+.btn.ghost{background:transparent;color:var(--paper);border-color:var(--mute);box-shadow:none;font-weight:700;font-size:15px;padding:9px 14px}
+.btn.ghost:active{transform:translateY(2px)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.icon-btn{background:transparent;border:2px solid var(--mute);color:var(--paper);font-size:13px;font-weight:700;padding:4px 9px;min-height:34px;white-space:nowrap}
+.icon-btn[disabled]{opacity:.35}
+
+/* ---------- title ---------- */
+#scr-title{justify-content:space-between;text-align:center}
+.t-top{display:flex;justify-content:flex-end}
+.t-mid{display:flex;flex-direction:column;align-items:center;gap:12px}
+.t-eyebrow{font-family:var(--f-pix);font-size:10px;color:var(--gold);letter-spacing:.1em}
+#title-cv{max-width:100%}
+.t-face{display:flex;align-items:flex-end;justify-content:center;gap:20px;margin-top:4px}
+.t-face canvas{width:84px;height:84px}
+.t-face .vs{font-family:var(--f-pix);color:var(--red);font-size:16px;margin-bottom:30px;animation:blink 1s steps(2) infinite}
+.t-tag{font-size:16.5px;font-weight:700;color:var(--paper);max-width:22em;text-wrap:balance;margin:0}
+.t-meta{font-size:13px;color:var(--mute);letter-spacing:.08em}
+.t-bot{display:flex;flex-direction:column;gap:12px;align-items:stretch}
+.foot{font-size:12px;color:var(--mute);letter-spacing:.06em}
+@keyframes blink{50%{opacity:.2}}
+
+/* ---------- setup ---------- */
+#scr-setup{justify-content:center;gap:20px}
+.box{background:var(--navy-2);border:3px solid var(--paper);box-shadow:0 0 0 3px var(--ink),6px 6px 0 3px rgba(0,0,0,.45);padding:18px}
+.setup-q{font-size:20px;font-weight:900;text-wrap:balance}
+.setup-sub{font-size:14px;color:var(--mute);margin-top:4px}
+.price-show{display:flex;align-items:baseline;justify-content:center;gap:8px;margin:16px 0 8px;color:var(--gold)}
+.price-show .num{font-size:30px}
+.price-show span:last-child{font-size:18px;font-weight:900}
+input[type=range]{width:100%;accent-color:var(--gold);height:30px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--mute);background:transparent;color:var(--paper);padding:6px 12px;font-size:15px;font-weight:700}
+.chip[aria-pressed="true"]{background:var(--gold);color:var(--ink);border-color:var(--gold)}
+.lab{font-size:14px;font-weight:700;color:var(--mute);margin:16px 0 8px;letter-spacing:.06em}
+
+/* ---------- play ---------- */
+#scr-play{gap:8px}
+.hud{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.hud .stage{flex:1;min-width:0;line-height:1.35}
+.hud .stage .num{font-size:10px;color:var(--gold);display:block}
+.hud .stage b{font-size:14px;color:var(--paper);font-weight:900;letter-spacing:.04em;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#kit-btn{border-color:var(--gold);color:var(--gold)}
+.arena{position:relative;flex:0 0 auto;height:clamp(200px,34dvh,280px);border:3px solid var(--paper);box-shadow:0 0 0 3px var(--ink);overflow:hidden;
+  background:linear-gradient(to bottom,transparent 58%,#23406e 58%,#23406e 59.5%,transparent 59.5%),repeating-linear-gradient(90deg,#1b335d 0 22px,#18304f 22px 44px) 0 100%/100% 41% no-repeat,linear-gradient(#20457f,#163464 58%)}
+.arena::before{content:"";position:absolute;left:36%;top:10%;width:24%;height:30%;border:3px solid #2c5594;background:linear-gradient(#3a6db0,#2a578f);box-shadow:inset 0 0 0 3px #1a3a6a}
+.arena[data-scene="office"]{background:linear-gradient(to bottom,transparent 60%,#2f3a52 60%,#2f3a52 62%,transparent 62%),repeating-linear-gradient(90deg,#46536d 0 30px,#3f4b63 30px 60px) 0 100%/100% 39% no-repeat,linear-gradient(#61779a,#53688a 60%)}
+.arena[data-scene="office"]::before{background:repeating-linear-gradient(#d6e4f5 0 4px,#9db3d4 4px 7px);border-color:#3d4a63;box-shadow:none}
+.arena[data-scene="night"]{background:linear-gradient(to bottom,transparent 58%,#141f3b 58%,#141f3b 59.5%,transparent 59.5%),repeating-linear-gradient(90deg,#101a33 0 22px,#0d172e 22px 44px) 0 100%/100% 41% no-repeat,linear-gradient(#0f1b3d,#0b1530 58%)}
+.arena[data-scene="night"]::before{background:radial-gradient(circle at 70% 35%,#F4CD3B 0 14%,transparent 15%),#081026;border-color:#1c2b52;box-shadow:none}
+.plat{position:absolute;border-radius:50%;background:rgba(5,12,28,.45)}
+.plat.b{right:6%;top:52%;width:38%;height:11%}
+.plat.h{left:4%;bottom:5%;width:40%;height:12%}
+#npc-cv{position:absolute;right:10%;top:9%;width:min(30%,124px);height:auto;aspect-ratio:1;max-width:100%}
+#me-cv{position:absolute;left:8%;bottom:9%;width:min(30%,120px);height:auto;aspect-ratio:1;max-width:100%}
+.idle{animation:bob 1.2s steps(2) infinite}
+@keyframes bob{50%{transform:translateY(-4px)}}
+.card-hud{position:absolute;background:var(--paper);color:var(--ink);border:3px solid var(--ink);padding:4px 8px 6px;width:50%;min-width:0;box-shadow:4px 4px 0 rgba(0,0,0,.35)}
+.card-hud.b{left:3%;top:6%}
+.card-hud.h{right:3%;bottom:6%}
+.ch-name{font-weight:900;font-size:15px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch-name small{font-weight:700;font-size:11px;color:#4a5878;margin-left:4px}
+.meter{display:grid;grid-template-columns:2.4em 1fr 2.1em;align-items:center;gap:5px;font-size:11px;font-weight:900;color:#3b4766;margin-top:3px}
+.meter .num{font-size:9px;color:var(--ink);text-align:right}
+.bar{height:9px;border:2px solid var(--ink);background:#d8cfb5;position:relative}
+.bar i{position:absolute;inset:0 auto 0 0;display:block;transition:width .5s steps(8)}
+.bar.heart i{background:var(--rose)} .bar.price i{background:var(--gold)} .bar.energy i{background:var(--mint)} .bar.job i{background:#5d8fe0}
+.bar.low i{background:var(--red)}
+.pr{font-size:11px;font-weight:900;color:#3b4766;margin-top:3px;display:flex;justify-content:space-between;gap:6px}
+.pr .num{font-size:9px;color:var(--ink)}
+.float{position:absolute;font-family:var(--f-zh);font-weight:900;font-size:15px;pointer-events:none;animation:floatUp 1.3s ease-out forwards;text-shadow:2px 2px 0 var(--ink),-1px -1px 0 var(--ink);white-space:nowrap;z-index:5}
+.float.up{color:var(--rose)} .float.down{color:var(--red)} .float.ok{color:var(--mint)} .float.gold{color:var(--gold)} .float.blue{color:#9cc0ff}
+@keyframes floatUp{0%{transform:translateY(8px);opacity:0}15%{opacity:1}100%{transform:translateY(-36px);opacity:0}}
+.flash{animation:flash .45s steps(2) 2}
+@keyframes flash{50%{filter:brightness(3) saturate(0)}}
+.shake{animation:shake .35s steps(4)}
+@keyframes shake{25%{transform:translate(-5px,2px)}50%{transform:translate(4px,-2px)}75%{transform:translate(-3px,1px)}}
+.crit-banner{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);font-weight:900;font-size:26px;color:var(--gold);text-shadow:3px 3px 0 var(--ink),-2px -2px 0 var(--ink);white-space:nowrap;animation:pop .95s ease-out forwards;z-index:6;pointer-events:none}
+.crit-banner.red{color:var(--red)}
+@keyframes pop{0%{transform:translate(-50%,-50%) scale(.4);opacity:0}25%{transform:translate(-50%,-50%) scale(1.15);opacity:1}70%{opacity:1}100%{transform:translate(-50%,-70%) scale(1);opacity:0}}
+
+.panel{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;overflow-y:auto;padding:2px 2px 4px}
+.dialog{background:var(--navy-2);border:3px solid var(--paper);box-shadow:0 0 0 3px var(--ink);padding:9px 12px 12px;min-height:84px;position:relative;cursor:pointer;flex:0 0 auto}
+.dialog .who{font-size:13px;font-weight:900;color:var(--gold);letter-spacing:.06em}
+.dialog .txt{font-size:17px;font-weight:700;line-height:1.55;min-height:1.55em}
+.dialog .more{position:absolute;right:8px;bottom:3px;color:var(--gold);font-size:12px;font-weight:900;animation:blink .8s steps(2) infinite}
+.tip{font-size:14px;line-height:1.55;color:var(--paper);background:rgba(244,205,59,.1);border-left:4px solid var(--gold);padding:7px 10px;flex:0 0 auto}
+.tip b{color:var(--gold)}
+.choices{display:flex;flex-direction:column;gap:8px;flex:0 0 auto}
+.opt{text-align:left;background:var(--paper);color:var(--ink);border:3px solid var(--ink);box-shadow:0 4px 0 var(--paper-2),0 4px 0 3px var(--ink);padding:9px 12px;font-size:15.5px;font-weight:700;line-height:1.45;position:relative}
+.opt:active{transform:translateY(3px);box-shadow:0 1px 0 var(--paper-2),0 1px 0 3px var(--ink)}
+.opt .cost{display:block;font-size:12px;font-weight:700;color:#5a6680;margin-top:2px}
+.opt.kit{background:#FFF4C4;outline:3px dashed var(--gold);outline-offset:3px}
+.opt.kit::after{content:"Ryan 建議";position:absolute;right:-3px;top:-14px;background:var(--gold);color:var(--ink);font-size:11px;font-weight:900;padding:1px 6px;border:2px solid var(--ink)}
+.timing{display:flex;flex-direction:column;gap:10px;align-items:stretch;flex:0 0 auto}
+.timing .hint{font-size:15px;font-weight:900;text-align:center;color:var(--gold)}
+.tbar{position:relative;height:34px;border:3px solid var(--paper);box-shadow:0 0 0 3px var(--ink);background:linear-gradient(90deg,#7a2a2a 0 28%,#2c5c8a 28% 42%,var(--gold) 42% 58%,#2c5c8a 58% 72%,#7a2a2a 72%)}
+.tbar .needle{position:absolute;top:-8px;bottom:-8px;width:6px;margin-left:-3px;background:var(--paper);border:2px solid var(--ink);left:0}
+.next-row{display:flex;flex:0 0 auto}
+.next-row .btn{flex:1}
+
+/* overlay */
+.overlay{position:absolute;inset:0;z-index:20;background:rgba(6,12,26,.93);display:flex;align-items:center;justify-content:center;padding:18px max(16px,env(safe-area-inset-left,0px)) 18px max(16px,env(safe-area-inset-right,0px))}
+.ov-box{width:100%;max-width:400px;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.ov-box canvas.px{width:104px;height:104px}
+.ov-k{font-family:var(--f-pix);font-size:11px;color:var(--gold);line-height:1.6}
+.ov-h{font-size:25px;font-weight:900;line-height:1.3;text-wrap:balance}
+.ov-p{font-size:15px;color:var(--paper);max-width:23em;text-wrap:balance;margin:0}
+.ov-big{font-size:21px;color:var(--gold);font-weight:900}
+.ov-big .num{font-size:19px}
+.ov-box .btn{align-self:stretch}
+.ov-legend{display:flex;flex-direction:column;gap:8px;text-align:left;font-size:14px;width:100%}
+.ov-legend div{display:flex;gap:10px;align-items:center}
+.ov-legend i{width:30px;height:10px;border:2px solid var(--paper);flex:0 0 auto}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;width:min(100%,280px)}
+.cal span{height:16px;border:2px solid var(--mute);font-family:var(--f-pix);font-size:7px;display:grid;place-items:center;color:var(--mute)}
+.cal span.past{background:var(--mute);color:var(--ink)}
+.cal span.today{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.day-big{font-family:var(--f-pix);font-size:30px;color:var(--gold)}
+.slide-in{animation:slideIn .5s steps(6) both}
+@keyframes slideIn{from{transform:translateX(60px);opacity:0}}
+
+/* ---------- result ---------- */
+#scr-result{overflow-y:auto;gap:14px;padding-bottom:20px;margin-right:-6px;padding-right:6px}
+.grade-wrap{display:flex;gap:14px;align-items:center}
+.grade{flex:0 0 auto;width:88px;height:88px;display:grid;place-items:center;background:var(--gold);color:var(--ink);border:4px solid var(--ink);box-shadow:0 0 0 3px var(--paper);font-family:var(--f-pix);font-size:38px}
+.grade-txt{min-width:0}
+.grade-txt .k{font-family:var(--f-pix);font-size:10px;color:var(--gold)}
+.grade-txt h2{margin:4px 0 2px;font-size:23px;font-weight:900;line-height:1.25}
+.grade-txt p{margin:0;font-size:14px;color:var(--mute)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{background:var(--navy-2);border:2px solid var(--mute);padding:8px 10px;min-width:0}
+.stat .l{font-size:12px;color:var(--mute);font-weight:700;letter-spacing:.06em}
+.stat .v{font-size:19px;font-weight:900;color:var(--paper);margin-top:1px}
+.stat .v .num{font-size:15px}
+.stat.wide{grid-column:1/-1;border-color:var(--gold)}
+.stat.wide .v{color:var(--gold)}
+.stat.bad .v{color:var(--rose)}
+.sec-h{font-size:15px;font-weight:900;color:var(--gold);letter-spacing:.08em;margin:4px 0 0}
+.lessons{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.lessons li{font-size:14.5px;background:rgba(147,166,203,.1);border-left:4px solid var(--mute);padding:8px 10px}
+.loss-list{display:flex;flex-direction:column;gap:2px}
+.loss{display:flex;justify-content:space-between;gap:10px;font-size:14.5px;border-bottom:1px dashed rgba(147,166,203,.35);padding:5px 0}
+.loss .r{font-weight:900;color:var(--rose);white-space:nowrap}
+.bridge{background:var(--navy);border:3px solid var(--paper);box-shadow:0 0 0 3px var(--ink);padding:14px}
+.bridge h3{margin:0 0 8px;font-size:18px;line-height:1.4;text-wrap:balance}
+.bridge ul{margin:0;padding-left:1.2em;font-size:14.5px}
+.bridge li{margin:3px 0}
+.bridge p{margin:8px 0 0;font-size:12.5px;color:var(--mute)}
+
+.lock{color-scheme:light;background:var(--paper);color:var(--ink);border:3px solid var(--ink);box-shadow:0 0 0 3px var(--gold),8px 8px 0 3px rgba(0,0,0,.4);padding:16px;margin-top:6px}
+.lock-h{display:flex;gap:10px;align-items:center}
+.lock-h canvas{width:36px;height:36px;flex:0 0 auto}
+.lock-h h3{margin:0;font-size:18px;font-weight:900;line-height:1.35}
+.lock ul{margin:10px 0 4px;padding-left:1.2em;font-size:14.5px}
+.lock ul li{margin:2px 0}
+.blur-rows{margin:10px 0;display:flex;flex-direction:column;gap:5px}
+.blur-rows div{height:14px;background:repeating-linear-gradient(90deg,#c9bd9b 0 10px,#d9cfb0 10px 20px);filter:blur(1.5px)}
+.f{display:flex;flex-direction:column;gap:4px;margin-top:10px}
+.f label{font-size:14px;font-weight:900}
+.f label small{font-weight:500;color:#5a6680}
+.f input,.f select{font:inherit;font-size:16px;padding:10px;border:2px solid var(--ink);background:#fff;color:var(--ink);border-radius:0;width:100%;min-width:0;color-scheme:light}
+.err{color:#b3261e;font-size:13px;font-weight:700}
+.consent{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:13.5px;line-height:1.5}
+.consent input{width:22px;height:22px;flex:0 0 auto;margin-top:1px;accent-color:var(--navy)}
+details.notice{font-size:12.5px;color:#3b4766;margin-top:6px;line-height:1.6}
+details.notice summary{cursor:pointer;font-weight:700;color:var(--navy)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.lock .btn{width:100%;margin-top:14px}
+.line-btn{width:100%;margin-top:10px;background:#06C755;color:#fff;border:3px solid var(--ink);font-weight:900;font-size:16px;padding:11px;box-shadow:0 4px 0 #04863a,0 4px 0 3px var(--ink)}
+.line-btn[disabled]{opacity:.5}
+.line-only{font-size:15px;font-weight:700;margin:10px 0 0}
+.line-hint{font-size:13px;font-weight:700;color:#04863a;margin-top:8px}
+.demo-note{font-size:12px;color:#7a5a00;background:#fff4c4;border:1px dashed var(--gold-d);padding:6px 8px;margin-top:10px}
+.done{text-align:center;padding:6px 0}
+.done h3{margin:6px 0;font-size:20px}
+.contact{background:var(--gold);color:var(--ink);border:3px solid var(--ink);box-shadow:0 0 0 3px var(--paper),6px 6px 0 3px rgba(0,0,0,.45);padding:16px;display:flex;flex-direction:column;gap:8px}
+.contact .co{font-size:13px;font-weight:900;letter-spacing:.12em}
+.contact .nm{font-size:24px;font-weight:900;line-height:1.2}
+.contact .nm small{font-size:15px;font-weight:700;margin-left:6px}
+.contact .ph{font-family:var(--f-pix);font-size:20px;letter-spacing:.02em;user-select:all;-webkit-user-select:all;white-space:nowrap}
+.contact .ln{font-size:15px;font-weight:900}
+.contact .ln span{user-select:all;-webkit-user-select:all}
+.contact .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+.contact .row a,.contact .row button{flex:1 1 120px;text-align:center;text-decoration:none;font-weight:900;font-size:16px;padding:11px;border:3px solid var(--ink);background:var(--ink);color:var(--gold)}
+.contact .row button{background:transparent;color:var(--ink)}
+.res-actions{display:flex;gap:10px;flex-wrap:wrap}
+.res-actions .btn{flex:1 1 140px}
+
+@media (prefers-reduced-motion:reduce){.idle,.t-face .vs,.dialog .more{animation:none}.shake,.flash{animation:none}}
+@media (max-height:660px){.dialog .txt{font-size:16px}.opt{font-size:14.5px;padding:7px 10px}.arena{height:clamp(184px,31dvh,240px)}.dialog{min-height:74px}}
+</style>
+
+<div id="app">
+
+  <!-- TITLE -->
+  <section id="scr-title" class="scr">
+    <div class="t-top"><button class="icon-btn snd-btn" type="button">音效 開</button></div>
+    <div class="t-mid">
+      <div class="t-eyebrow">屋主自售 21 天</div>
+      <canvas id="title-cv" class="px" role="img" aria-label="殺價魔王大作戰"></canvas>
+      <div class="t-face">
+        <canvas id="t-me" class="px idle" aria-hidden="true"></canvas>
+        <div class="vs">VS</div>
+        <canvas id="t-boss" class="px idle" aria-hidden="true" style="animation-delay:.3s"></canvas>
+      </div>
+      <p class="t-tag">不找仲介，自己賣房子。<br>白天上班、晚上帶看，還有殺價魔王等著你。<br>21 天，你撐得住嗎？</p>
+    </div>
+    <div class="t-bot">
+      <button id="start-btn" class="btn" type="button">開始挑戰</button>
+      <div class="t-meta">約 5 分鐘 · 免下載 · 免註冊</div>
+      <div class="foot">日勝房屋 業務區長 吳松儒 Ryan</div>
+    </div>
+  </section>
+
+  <!-- SETUP -->
+  <section id="scr-setup" class="scr" hidden>
+    <div class="box">
+      <div class="setup-q">先設定你的房子</div>
+      <div class="setup-sub">只用來計算遊戲裡的成交金額，抓個大概就好。</div>
+      <div class="lab">開價（萬元）</div>
+      <div class="price-show"><span class="num" id="price-show">1,200</span><span>萬</span></div>
+      <input id="price-range" type="range" min="300" max="5000" step="10" value="1200" aria-label="開價（萬元）">
+      <div class="chips" id="price-chips" style="margin-top:10px">
+        <button class="chip" type="button" data-v="800">800 萬</button>
+        <button class="chip" type="button" data-v="1200" aria-pressed="true">1200 萬</button>
+        <button class="chip" type="button" data-v="1800">1800 萬</button>
+        <button class="chip" type="button" data-v="2500">2500 萬</button>
+      </div>
+      <div class="lab">房屋類型</div>
+      <div class="chips" id="type-chips">
+        <button class="chip" type="button" data-v="大樓" aria-pressed="true">大樓</button>
+        <button class="chip" type="button" data-v="華廈">華廈</button>
+        <button class="chip" type="button" data-v="公寓">公寓</button>
+        <button class="chip" type="button" data-v="透天">透天</button>
+      </div>
+    </div>
+    <button id="go-btn" class="btn" type="button">決定自己賣！</button>
+  </section>
+
+  <!-- PLAY -->
+  <section id="scr-play" class="scr" hidden>
+    <div class="hud">
+      <div class="stage"><span class="num" id="hud-day">DAY 1/21</span><b id="hud-title">週六</b></div>
+      <button id="kit-btn" class="icon-btn" type="button">求救 Ryan ×2</button>
+      <button class="icon-btn snd-btn" type="button">音效 開</button>
+    </div>
+    <div class="arena" id="arena" data-scene="home">
+      <div class="plat b"></div><div class="plat h"></div>
+      <canvas id="npc-cv" class="px idle" aria-hidden="true"></canvas>
+      <canvas id="me-cv" class="px idle" aria-hidden="true" style="animation-delay:.25s"></canvas>
+      <div class="card-hud b">
+        <div class="ch-name" id="npc-name">手機<small></small></div>
+        <div id="npc-meter" hidden>
+          <div class="meter"><span>意願</span><div class="bar heart"><i id="heart-bar"></i></div><span class="num" id="heart-num">40</span></div>
+          <div class="pr"><span>你守住</span><span class="num" id="price-num">1200萬</span></div>
+        </div>
+      </div>
+      <div class="card-hud h">
+        <div class="ch-name">你<small>屋主・上班族</small></div>
+        <div class="meter"><span>體力</span><div class="bar energy" id="e-wrap"><i id="e-bar"></i></div><span class="num" id="e-num">100</span></div>
+        <div class="meter"><span>工作</span><div class="bar job" id="j-wrap"><i id="j-bar"></i></div><span class="num" id="j-num">100</span></div>
+      </div>
+    </div>
+    <div class="panel" id="panel">
+      <div class="dialog" id="dialog" role="button" tabindex="0" aria-label="對話框，點一下繼續"><div class="who" id="d-who"></div><div class="txt" id="d-txt" aria-live="polite"></div><div class="more" id="d-more" hidden>點一下繼續 ▼</div></div>
+      <div class="tip" id="tip" hidden></div>
+      <div class="choices" id="choices" hidden></div>
+      <div class="timing" id="timing" hidden>
+        <div class="hint">抓準時機，按下「出招」！</div>
+        <div class="tbar" id="tbar"><div class="needle" id="needle"></div></div>
+        <button class="btn" id="fire-btn" type="button">出招！</button>
+      </div>
+      <div class="next-row" id="next-row" hidden><button class="btn" id="next-btn" type="button">繼續 ▶</button></div>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="scr-result" class="scr" hidden>
+    <div class="grade-wrap">
+      <div class="grade" id="r-grade">A</div>
+      <div class="grade-txt"><div class="k">21 DAYS RESULT</div><h2 id="r-title"></h2><p id="r-desc"></p></div>
+    </div>
+    <div class="stats" id="r-stats"></div>
+    <div id="r-loss-wrap"><h3 class="sec-h">自己賣的代價</h3><div class="loss-list" id="r-loss"></div></div>
+    <h3 class="sec-h">這 21 天學到的事</h3>
+    <ul class="lessons" id="r-lessons"></ul>
+
+    <div class="bridge">
+      <h3>這 21 天的事，其實不用你一個人扛</h3>
+      <ul>
+        <li>過濾電話、代為帶看，你不用再請假</li>
+        <li>面對殺價和挑剔，有人幫你談</li>
+        <li>斡旋、代書、履約保證，訂金和貸款不出包</li>
+        <li>稅費試算、現況說明、點交清單，交屋不卡關</li>
+      </ul>
+      <p>實際服務內容與費用，歡迎直接問 Ryan。</p>
+    </div>
+
+    <div class="lock" id="lock">
+      <div id="lock-form-wrap">
+        <div class="lock-h"><canvas id="lock-cv" class="px" aria-hidden="true"></canvas><h3>遊戲是模擬的，<br>你家的行情是真的。</h3></div>
+        <ul>
+          <li>你家的<b>建議開價區間</b></li>
+          <li>同區近一年<b>真實成交行情</b></li>
+          <li>賣房要準備的<b>文件與稅費試算</b></li>
+        </ul>
+        <div class="blur-rows" aria-hidden="true"><div style="width:92%"></div><div style="width:70%"></div><div style="width:84%"></div></div>
+        <form id="lead-form" novalidate>
+          <div class="f"><label for="lead-name">怎麼稱呼你</label><input id="lead-name" autocomplete="name" maxlength="20" placeholder="例如：陳先生"></div>
+          <div class="f"><label for="lead-contact">手機或 LINE ID</label><input id="lead-contact" autocomplete="tel" maxlength="40" placeholder="0912345678 或 LINE ID"></div>
+          <div class="f"><label for="lead-area">房子在哪個社區或路段 <small>（選填）</small></label><input id="lead-area" maxlength="40" placeholder="例如：左營 文自路附近"></div>
+          <div class="f"><label for="lead-time">方便聯絡的時間</label>
+            <select id="lead-time"><option>都可以</option><option>平日白天</option><option>平日晚上</option><option>週末</option><option>只要傳 LINE 就好</option></select></div>
+          <div class="hp" aria-hidden="true"><label for="lead-web">網站</label><input id="lead-web" tabindex="-1" autocomplete="off"></div>
+          <label class="consent"><input type="checkbox" id="lead-consent"><span>我同意日勝房屋 Ryan 吳松儒依下方說明使用我的資料，提供估價報告並與我聯繫。</span></label>
+          <details class="notice"><summary>個人資料蒐集告知</summary>
+            蒐集者：日勝房屋 Ryan 吳松儒。目的：提供房屋估價報告及不動產仲介服務之聯繫。類別：稱呼、聯絡方式、你填寫的房屋資訊與遊戲結果。期間：至你要求刪除為止，最長兩年。你可以隨時要求查詢、更正或刪除資料，直接聯繫 Ryan 即可。不填資料不影響遊戲，只是無法收到報告。
+          </details>
+          <div class="err" id="lead-err" role="alert"></div>
+          <button class="btn" id="lead-submit" type="submit">免費取得我家的報告</button>
+        </form>
+        <p class="line-only" id="line-only" hidden>加 Ryan 的 LINE，傳一句「我要報告」，就會收到你家的建議開價和成交行情。</p>
+        <button class="line-btn" id="line-btn" type="button">或直接傳 LINE 問 Ryan</button>
+        <div class="line-hint" id="line-hint" hidden></div>
+        <div class="demo-note" id="demo-note" hidden></div>
+      </div>
+      <div class="done" id="lead-done" hidden>
+        <canvas id="done-cv" class="px" style="width:64px;height:64px;margin:0 auto" aria-hidden="true"></canvas>
+        <h3>收到了，謝謝你！</h3>
+        <p style="margin:0;font-size:15px">Ryan 會在 24 小時內把報告傳給你。<br>有急事可以直接打 0975-711-267。</p>
+      </div>
+    </div>
+
+    <div class="contact" id="contact">
+      <div class="co">日勝房屋・業務區長</div>
+      <div class="nm">吳松儒<small>Ryan</small></div>
+      <div class="ph" id="ph-num">0975-711-267</div>
+      <div class="ln">LINE ID：<span id="ln-id">dr.song0729</span></div>
+      <div class="row"><a href="tel:0975711267" id="call-btn">打電話給 Ryan</a><a href="https://line.me/ti/p/~dr.song0729" target="_blank" rel="noopener" id="line-add">加 LINE 好友</a><button type="button" id="copy-btn">複製號碼</button></div>
+    </div>
+
+    <div class="res-actions">
+      <button class="btn ghost" id="again-btn" type="button">再挑戰一次</button>
+      <button class="btn ghost" id="share-btn" type="button">分享這個遊戲</button>
+    </div>
+    <div class="foot" style="text-align:center">日勝房屋 業務區長 吳松儒 Ryan · 0975-711-267</div>
+  </section>
+
+  <div class="overlay" id="overlay" hidden><div class="ov-box" id="ov-box"></div></div>
+</div>
+
+<script>
+const DOW=['六','日','一','二','三','四','五'];
+/* ================== 設定（部署前填這裡） ================== */
+const CONFIG = {
+  lineId: '',                                  // LINE 官方帳號 ID（@開頭）；有填就用官方帳號一鍵帶訊息
+  linePersonal: 'dr.song0729',                 // 個人 LINE ID；沒有官方帳號時，按鈕會開啟加好友頁
+  firebase: { apiKey: '', projectId: '' },     // 填了就把名單寫進 Firestore；留空為試玩模式
+  collection: 'leads',
+  days: 21
+};
+
+/* ================== 像素圖 ================== */
+const D='#0A1428';
+const SPR={
+ house:{pal:{D,R:'#E5483B',r:'#B8342A',W:'#F7F0DC',Y:'#F4CD3B',K:D,B:'#114F9C',G:'#F4CD3B'},rows:[
+  "................","......DDDD..DD..",".....DRRRRD.DGD.","....DRRrRRRDDGD.","...DRRRRRRrRRDD.","..DRRrRRRRRRRRD.",".DDDDDDDDDDDDDDD","..DWWWWWWWWWWD..",
+  "..DWYYWWWWYYWD..","..DWYKWWWWYKWD..","..DWWWWWWWWWWD..","..DWWWWBBWWWWD..","..DWWWWBBWWWWD..","..DWWWWBGWWWWD..","..DDDDDDDDDDDD..","................"]},
+ me:{pal:{D,H:'#1E2233',S:'#F2C9A0',K:D,R:'#9a4a3a',W:'#F7F0DC',T:'#114F9C',N:'#2B3550'},rows:[
+  "................",".....DDDDDD.....","....DHHHHHHD....","....DHSSSSHD....","....DSKSSKSD....","....DSSSSSSD....","....DSRSSRSD....",".....DSRRSD.....",
+  "....DWWTTWWD....","...DWWWTTWWWD...","..DSWWWTTWWWSD..","..DSWWWTTWWWSD..","...DWWWWWWWWD...","...DNNNNNNNND...","...DNND..DNND...","...DDDD..DDDD..."]},
+ meTired:{pal:{D,H:'#1E2233',S:'#E9C3A0',K:D,G:'#7d6a8a',B:'#7FC4FF',W:'#E6DDC6',T:'#114F9C',N:'#2B3550',M:'#8a5a5a'},rows:[
+  "................",".....DDDDDD.....","....DHHHHHHD.B..","....DHSSSSHD.B..","....DSGSSGSD....","....DSKSSKSD....","....DSSMMSSD....",".....DSSSSD.....",
+  "....DWWTTWWD....","...DWWWTTWWWD...","..DSWWWTTWWWSD..","..DSWWWTTWWWSD..","...DWWWWWWWWD...","...DNNNNNNNND...","...DNND..DNND...","...DDDD..DDDD..."]},
+ wang:{pal:{D,H:'#3A3F4F',S:'#F2C9A0',L:'#BFE3FF',R:'#B8342A',C:'#4A7FD0',W:'#F7F0DC',P:'#222',N:'#2B3550',Y:'#F4CD3B'},rows:[
+  "................",".....DDDDDD.....","....DHHHHHHD....","....DHSSSSHD....","....DSSSSSSD....","....DLLDDLLD....","....DSSSSSSD....","....DSSRRSSD....",
+  ".....DSSSSD.....","....DCCWWCCD....","...DCCCWCCCCD...","..DSCCCWCCCDPD..","..DSCCCCCCCSYD..","...DCCCCCCCCD...","...DNNND.DNNND..","...DDDD...DDDD.."]},
+ lin:{pal:{D,U:'#9B6BD6',u:'#7A4FB5',S:'#F2C9A0',K:D,R:'#E5483B',M:'#D9417F',W:'#F7F0DC',O:'#F4CD3B'},rows:[
+  "....UuUUuUUU....","...UUUuUUUUuU...","..UuUSSSSSSUuU..","..UUSKSSSSKSUU..","..UuSSSSSSSSUU..","...USSRRRRSSU...","....DSSSSSSD....","....DMMMMMMD....",
+  "...DMMWMMWMMD...","..DSMMMMMMMMSD..","..DSMWMMWMMMSDO.","...DMMMMMMMMDOO.","...DMMMMMMMMD...","....DSSD.DSSD...","....DDDD.DDDD...","................"]},
+ boss:{pal:{D,R:'#E5483B',H:'#14182A',S:'#E8B48C',K:'#0A0A0A',W:'#FFFFFF',X:'#262B3D',Y:'#F4CD3B'},rows:[
+  ".R............R.",".RR..DDDDDD..RR.","..RRDHHHHHHDRR..","...DHHHHHHHHD...","...DSSSSSSSSD...","...DKKKKKKKKD...","...DSKKSSKKSD...","...DSSSSSSSSD...",
+  "...DSWWWWWWSD...","....DSSSSSSD....","..DXXXYYYYXXXD..",".DXXXXXYYXXXXXD.",".DXXXWXXXXWXXXD.",".DSXXXXXXXXXXSD.","..DXXXXDDXXXXD..","..DDDDD..DDDDD.."]},
+ mgr:{pal:{D,G:'#A9AEBB',S:'#EDC29C',L:'#DDEEFF',R:'#B8342A',X:'#4A5670',W:'#F7F0DC'},rows:[
+  "................",".....DDDDDD.....","....DGGGGGGD....","....DGSSSSGD....","....DLLDDLLD....","....DSSSSSSD....","....DSRRRRSD....",".....DSSSSD.....",
+  "....DXWRRWXD....","...DXXWRRWXXD...","..DXXXXRRXXXXD..","..DSXXXXXXXXSD..","...DXXXXXXXXD...","...DXXXXXXXXD...","...DXXD..DXXD...","...DDDD..DDDD..."]},
+ phone:{pal:{D,K:'#20263a',B:'#4A7FD0',W:'#F7F0DC',Y:'#F4CD3B'},rows:[
+  "................",".Y....DDDD....Y.","..Y..DKKKKD..Y..","....DKBBBBKD....","....DKBWWBKD....","Y...DKBBBBKD...Y",".Y..DKBWWBKD..Y.","....DKBBBBKD....",
+  "....DKBWWBKD....","Y...DKBBBBKD...Y",".Y..DKBBBBKD..Y.","....DKKKKKKD....","....DKKWWKKD....",".....DKKKKD.....","................","................"]},
+ doc:{pal:{D,W:'#F7F0DC',K:'#6b7590',R:'#E5483B'},rows:[
+  "................","...DDDDDDDD.....","...DWWWWWWDD....","...DWKKKKWWDD...","...DWWWWWWWWD...","...DWKKKKKKWD...","...DWWWWWWWWD...","...DWKKKKKKWD...",
+  "...DWWWWWWWWD...","...DWKKKKWWWD...","...DWWWWWRRWD...","...DWWWWRWWRD...","...DWWWWWRRWD...","...DDDDDDDDDD...","................","................"]},
+ lock:{pal:{D,G:'#A9851A',Y:'#F4CD3B',K:D},rows:[
+  "................",".....DDDDDD.....","....DD....DD....","...DD......DD...","...D........D...","...D........D...","..DDDDDDDDDDDD..","..DYYYYYYYYYYD..",
+  "..DYYYYKKYYYYD..","..DYYYYKKYYYYD..","..DYYYYYKYYYYD..","..DYYYYYKYYYYD..","..DGGGGGGGGGGD..","..DDDDDDDDDDDD..","................","................"]},
+ key:{pal:{D,Y:'#F4CD3B'},rows:[
+  "................","................","...DDDD.........","..DYYYYD........",".DYYDDYYD.......",".DYD..DYDDDDDDD.",".DYD..DYYYYYYYYD",".DYYDDYYDDDYDYD.",
+  "..DYYYYD..DYDYD.","...DDDD....D.D..","................","................","................","................","................","................"]}
+};
+function drawSprite(cv,s){cv.width=16;cv.height=16;const c=cv.getContext('2d');c.clearRect(0,0,16,16);
+  s.rows.forEach((r,y)=>{for(let x=0;x<16;x++){const ch=r[x];if(ch&&ch!=='.'){c.fillStyle=s.pal[ch]||'#f0f';c.fillRect(x,y,1,1);}}});}
+function pixelText(cv,lines,size,fg,sh,scale){
+  const font=`900 ${size}px "Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif`;
+  const t=document.createElement('canvas').getContext('2d');t.font=font;
+  const lh=size+4;const w=Math.ceil(Math.max(...lines.map(l=>t.measureText(l).width)))+4;const h=lh*lines.length+2;
+  t.canvas.width=w;t.canvas.height=h;t.font=font;t.textBaseline='top';t.fillStyle='#fff';t.textAlign='center';
+  lines.forEach((l,i)=>t.fillText(l,w/2,1+i*lh));
+  const d=t.getImageData(0,0,w,h).data;cv.width=w+2;cv.height=h+2;const c=cv.getContext('2d');
+  [[sh,2],[fg,0]].forEach(([col,o])=>{c.fillStyle=col;for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(d[(y*w+x)*4+3]>110)c.fillRect(x+o,y+o,1,1);});
+  cv.dataset.scale=scale;fitTitle(cv);
+}
+function fitTitle(cv){if(!cv.width)return;cv.style.width=Math.min(cv.width*(+cv.dataset.scale||4),cv.parentElement.clientWidth||300)+'px';cv.style.height='auto';}
+
+/* ================== 買方（帶看與議價） ================== */
+// type: view = 看屋挑剔（可能起衝突）；nego = 議價。p = 價格變動（佔開價 %），h = 買方意願變動
+const BUYERS={
+ wang:{name:'王先生',title:'比價達人',start:40,angry:'你這什麼態度？我是來看房子的耶！',
+  intro:'手機裡存滿實價登錄的精算型買方，每一句都在跟別間比。',
+  rounds:[
+   {type:'view',say:'一進門就說：「這玄關好小，鞋櫃也太舊了吧。」',opts:[
+     {k:'good',t:'鞋櫃很多人入住都會重做，我把附近系統櫃的行情給你參考。',h:22,p:0,fb:'喔，這樣算一算，其實還好。',tip:'把缺點換算成實際花費，買方就不會無限放大它。'},
+     {k:'mid',t:'那鞋櫃的錢，我算你便宜一點。',h:12,p:-2,fb:'好啊，那我再看看其他地方。',tip:'小缺點就讓價，買方會一路找下去。'},
+     {k:'bad',t:'你是來看房子，還是來挑毛病的？',h:-22,p:0,fb:'……我只是講一下而已。',tip:'看屋挑剔很正常，嗆回去只會讓買方想走。'}]},
+   {type:'nego',say:'我查過實價登錄，同社區上個月才賣，比你便宜快一成喔。',opts:[
+     {k:'good',t:'那戶是低樓層又沒車位，我們是高樓層邊間，單價本來就不一樣。',h:26,p:0,fb:'嗯……高樓層邊間，確實差蠻多的。',tip:'比價要比「條件」。樓層、車位、座向、屋況都會拉開單價。'},
+     {k:'mid',t:'不然我少一點，跟他差不多就好。',h:14,p:-4,fb:'這麼爽快？那我再看看還能談多少。',tip:'還沒講清楚差在哪就先讓價，買方會覺得還能再砍。'},
+     {k:'bad',t:'實價登錄都不準啦，你不要亂看。',h:-24,p:0,fb:'政府的資料不準？那你的開價是怎麼來的？',tip:'否定公開資料，只會讓買方覺得你在隱瞞什麼。'}]},
+   {type:'nego',say:'我最多只能出到你開價的九折，再多就不買了。',opts:[
+     {k:'good',t:'九折差有點多，我們各退一步，九六折，交屋前幫你清潔好，可以嗎？',h:32,p:-4,fb:'九六折含清潔……好，我很有興趣。',tip:'讓步要小、要附條件，讓買方覺得是「談」來的。'},
+     {k:'bad',t:'九折？那你去買別間啦。',h:-30,p:0,fb:'好喔，那就這樣。',tip:'直接趕人很痛快，但也把一個真買方送走了。'},
+     {k:'mid',t:'好啦好啦，九折就九折。',h:42,p:-10,fb:'好！（心想：早知道開更低）',tip:'買方嘴裡的「最多」，通常不是真的最多。'}]}
+  ]},
+ lin:{name:'林媽媽',title:'挑剔阿姨',start:35,angry:'哎喲，講話這麼兇，我不想看了啦！',
+  intro:'嫌貨才是買貨人。她每個角落都看得很仔細，每個缺點都要你折錢。',
+  rounds:[
+   {type:'view',say:'哎喲，這面牆有壁癌耶，整理起來要花不少錢喔。',opts:[
+     {k:'mid',t:'那這部分我折給你，總價再少一點。',h:14,p:-3,fb:'好啊，那我再找找還有哪裡要折。',tip:'小問題折太多，買方會繼續找下一個問題。'},
+     {k:'good',t:'我們估過了，處理大概幾萬塊，報價單在這，不影響結構。',h:24,p:0,fb:'喔，有報價單，那還好。',tip:'把缺點「量化」，買方就不會無限放大它。'},
+     {k:'bad',t:'哪間舊房子沒有壁癌？',h:-20,p:0,fb:'所以你承認有問題囉？',tip:'反問句聽起來像在吵架，買方只會更堅持要折價。'}]},
+   {type:'view',say:'這格局有點怪，我家那組沙發可能放不下欸。',opts:[
+     {k:'bad',t:'放不下就換一組小的啊。',h:-24,p:0,fb:'我那組沙發很貴耶！',tip:'買方在想像住進來的樣子，不要打斷那個畫面。'},
+     {k:'good',t:'我幫你量過了，客廳這面牆四米二，三人座沒問題，平面圖給你參考。',h:26,p:0,fb:'四米二？那我那組放得下！',tip:'事先準備尺寸和平面圖，幫買方把傢俱「放進去」。'},
+     {k:'mid',t:'格局是比較特別啦，價格可以再談。',h:10,p:-3,fb:'對嘛，格局不好就要算便宜一點。',tip:'把「特色」說成「缺點」，等於自己幫買方找殺價理由。'}]},
+   {type:'view',say:'這時間來看好暗喔，採光是不是不太好？',opts:[
+     {k:'good',t:'這間是東向，早上光線最好。週末早上我再約你來看一次？',h:22,p:0,fb:'早上來看啊……好，那我再來一次。',tip:'不同座向有最好看的時段，安排對的時間帶看，屋況會加分。'},
+     {k:'bad',t:'把燈打開就好啦。',h:-20,p:0,fb:'買房子又不是買燈。',tip:'敷衍的回答會讓買方覺得問題被你看輕了。'},
+     {k:'mid',t:'採光普通啦，所以開價才這樣。',h:6,p:-2,fb:'那價格應該還可以再低一點吧？',tip:'把價格跟缺點綁在一起，買方就會照著缺點砍價。'}]},
+   {type:'nego',say:'我兒子說這價錢太貴了，叫我再殺兩成。',opts:[
+     {k:'mid',t:'兩成不行啦，一成可以。',h:24,p:-10,fb:'一成喔？好，我回去跟兒子說。',tip:'被嚇到就直接讓一成，是屋主最常見的失守。'},
+     {k:'bad',t:'那叫你兒子自己來買。',h:-30,p:0,fb:'你這樣講話就不對了喔！',tip:'對買方的家人不客氣，等於把整個家庭都得罪了。'},
+     {k:'good',t:'兩成差太多了。你兒子要不要一起來看？我把附近成交資料整理給他。',h:30,p:0,fb:'也好，讓他自己看看資料。',tip:'真正做決定的人沒來，就想辦法讓他來，不要對著傳話的人讓價。'}]}
+  ]},
+ boss:{name:'黑董',title:'殺價魔王',start:28,angry:'呵，沉不住氣啊。',
+  intro:'手上現金滿滿的投資客，專挑累壞、急著賣的屋主下手。最後的大魔王！',
+  rounds:[
+   {type:'nego',say:'我現金買，不用貸款。你開價直接打八折。',opts:[
+     {k:'bad',t:'現金了不起喔？',h:-24,p:0,fb:'呵，脾氣倒是不小。',tip:'被激怒就輸了。投資客最喜歡看屋主沉不住氣。'},
+     {k:'mid',t:'現金喔……那九折我可以考慮。',h:14,p:-10,fb:'九折？看來還有空間。',tip:'付款方式和價格是兩件事，不要因為「現金」就讓一成。'},
+     {k:'good',t:'現金很好，交屋時間我們可以配合，但價格要看行情，不是看付款方式。',h:22,p:0,fb:'……還算有點概念。',tip:'用「交屋配合」回應付款優勢，價格守在行情上。'}]},
+   {type:'nego',say:'我手上有三間在比，你不降，我現在就走。',opts:[
+     {k:'good',t:'了解，你比完再跟我說。這個價格我們很有信心。',h:20,p:0,fb:'（停下腳步）……你倒是很穩。',tip:'對方放話要走時，穩住比追上去更有力。'},
+     {k:'mid',t:'先別走先別走，我再降一點！',h:12,p:-5,fb:'（冷笑）果然還能降。',tip:'一追就讓價，等於告訴對方你很急。'},
+     {k:'bad',t:'那你去買那三間啊，幹嘛來看我的。',h:-26,p:0,fb:'好啊，那我走了。',tip:'跟對方鬥氣，最後吃虧的是自己的成交機會。'}]},
+   {type:'nego',say:'房市要崩了啦，你現在不賣，以後更賣不掉。',opts:[
+     {k:'mid',t:'真的嗎……那我少一點好了。',h:10,p:-5,fb:'這就對了，識時務。',tip:'被唱衰行情就降價，正中投資客下懷。'},
+     {k:'bad',t:'你才崩，你全家都崩！',h:-32,p:0,fb:'？？？',tip:'很解氣，但這一局你也崩了。'},
+     {k:'good',t:'市場怎麼走沒人說得準，但這區的機能和交通不會跑，自住的人一直都在找。',h:22,p:0,fb:'嗯……這區自住需求確實不少。',tip:'回到地段和需求，不跟對方猜行情。'}]},
+   {type:'nego',say:'最後一口價：你開價的八五折，現在就簽。',opts:[
+     {k:'mid',t:'好……八五折就八五折。',h:50,p:-15,fb:'簽約愉快！（轉身偷笑）',tip:'「最後一口價」常常是談判話術，不一定真的是最後。'},
+     {k:'good',t:'謝謝你的誠意。九五折，這週就能簽，這是我的底線。',h:36,p:-5,fb:'……九五折。好吧，算你厲害。',tip:'給出清楚的底線和成交時間，讓對方知道再壓也沒用。'},
+     {k:'bad',t:'不賣了！',h:-40,p:0,fb:'那就算了。',tip:'情緒性收尾，前面的努力全部歸零。'}]}
+  ]}
+};
+const AD_ROUND={type:'view',say:'等一下，廣告寫四房，這間根本是陽台外推的吧？',opts:[
+  {k:'good',t:'抱歉廣告寫得不清楚，這間是外推增建，價格我是以三房在算的。',h:4,p:0,fb:'……好吧，至少你有承認。',tip:'廣告寫不實，買方一進門信任就沒了，只能盡量補救。'},
+  {k:'mid',t:'外推的也可以當房間用啦，不然我算你便宜一點。',h:-6,p:-4,fb:'所以廣告是寫假的嘛。',tip:'被抓到廣告不實再讓價，等於先失信再失價。'},
+  {k:'bad',t:'大家都這樣寫啊，又不是只有我。',h:-24,p:0,fb:'大家都這樣，不代表你這樣是對的。',tip:'廣告不實還硬拗，買方會直接把你列入黑名單。'}]};
+
+/* ================== 21 天劇本 ================== */
+const weekday=d=>{while(['六','日'].includes(DOW[(d-1)%7]))d++;return d;};
+const FX_WORK_TIP='屋主上班時間跟買方看屋時間，常常撞在一起。';
+const STEPS=[
+ {id:'ad',day:1,scene:'night',who:{sp:'doc',name:'自己刊登',title:'591 廣告'},
+  pre:[{t:'週末一早，你開始自己拍照、量坪數、寫廣告文案，一路弄到半夜一點。',fx:{e:-10,late:1}}],
+  q:'家裡有一間是陽台外推出來的小房間。廣告要怎麼寫？',
+  opts:[
+   {k:'bad',trap:1,t:'寫「四房」，看起來比較大、比較好賣。',set:'adFake',fb:'刊登完成，點閱數衝很高！',tip:'外推增建不是合法房間。廣告寫四房，買方看屋時發現，信任會直接歸零。'},
+   {k:'good',t:'寫「三房＋陽台外推」，照實說明。',fb:'點閱少了一些，但來問的人都比較認真。',tip:'照實寫，反而能篩掉之後會翻臉的買方。'},
+   {k:'mid',t:'先不寫房間數，照片多放幾張就好。',e:-6,fb:'結果每個打來的人第一句都問「幾房？」，你又多接了十幾通電話。',tip:'資訊寫不清楚，只會換來更多重複的詢問電話。'}]},
+ {id:'calls',day:2,scene:'home',who:{sp:'phone',name:'手機',title:'響個不停'},
+  pre:[{t:'廣告上架第一天，手機響了 23 通。一半是仲介問能不能讓他們賣，還有人一開口就問「最低多少」。'}],
+  q:'這些電話，你打算怎麼處理？',
+  opts:[
+   {k:'mid',t:'每一通都接，怕漏掉真的買方。',e:-15,fb:'一天講下來喉嚨都啞了，真正想看房的只有兩組。',tip:'自售最累的是過濾電話。房仲會先幫你篩掉看熱鬧和同業。'},
+   {k:'good',t:'開靜音，晚上集中回撥，先問清楚預算和需求。',e:-8,fb:'晚上回撥，篩出兩組比較認真的。不過有一組已經去看別間了。',tip:'先問預算、需求、看屋時間，可以省下很多白跑的帶看。'},
+   {k:'bad',trap:1,t:'有人問最低價，就直接說「九折可以談」。',e:-6,set:'floor',fb:'對方說：「好，我考慮看看。」掛掉後你有點後悔。',tip:'底價一說出口就收不回來，消息還可能傳到其他買方耳裡。'}]},
+ {id:'wangcall',day:3,scene:'office',who:{sp:'mgr',name:'部門主管',title:'週一例會'},
+  pre:[{t:'週一早上 10 點，你在開部門會議，手機一直震。是看到廣告的王先生，想約週三下午 3 點看房。'}],
+  q:'會議還在進行，怎麼辦？',
+  opts:[
+   {k:'mid',t:'跟主管請半天假。',j:-12,leave:.5,fb:{who:'主管：',t:'又要請假？專案很趕，你知道吧。'},tip:FX_WORK_TIP},
+   {k:'good',t:'會後回電，請王先生改到晚上 7 點。',e:-8,heart:{wang:-6},fb:{who:'王先生：',t:'晚上喔……好吧，但我只能待半小時。'},tip:'改時間可以保住工作，但買方的熱度會一點一點流失。'},
+   {k:'bad',t:'會議中偷偷回訊息。',j:-12,fb:{who:'主管：',t:'你剛剛說的數字是多少？……你有在聽嗎？'},tip:'一邊上班一邊接買方，兩邊都顧不好。'}]},
+ {id:'vwang',day:5,kind:'view',buyer:'wang'},
+ {id:'deposit',day:5,when:()=>G.flags.wangDeal,scene:'home',who:{sp:'wang',name:'王先生',title:'想下訂'},
+  pre:[{who:'王先生：',t:'我很喜歡這間！我先付 10 萬訂金，你寫張收據給我就好。'}],
+  q:'這筆訂金要怎麼收？',
+  opts:[
+   {k:'bad',trap:1,t:'好，手寫一張收據，先把錢收下來。',set:'handReceipt',fb:'你收下 10 萬，心裡踏實多了。'},
+   {k:'good',t:'先約代書擬好條款，也問清楚他的自備款和貸款。',j:-12,e:-6,leave:.5,set:'depositOk',fb:'你又請了半天假，跑了一趟代書事務所。',tip:'收訂金前把條款和買方資金確認好，最能保護自己。'},
+   {k:'mid',trap:1,t:'不用收訂金，口頭說好就好。',set:'verbal',fb:{who:'王先生：',t:'好啊，那我下週來簽約！'}}]},
+ {id:'wangback',day:7,when:()=>G.flags.wangDeal,kind:'narr',scene:'office',who:{sp:'phone',name:'王先生',title:'來電'},
+  lines:()=>{const L=[{who:'王先生（電話）：',t:'不好意思，我家人反對，房子我不買了。'}];
+   if(G.flags.handReceipt)L.push({t:'收據上沒寫違約怎麼處理。他要你把 10 萬全部退回，你不肯，他說要申請調解。你為了調解又請了一天假。',fx:{e:-14,j:-14,leave:1,fight:1}});
+   else if(G.flags.verbal)L.push({t:'口頭約定沒有保障。你為了等他簽約，推掉了另外兩組看屋，等於白忙一週。',fx:{e:-8}});
+   else L.push({t:'還好事先請代書把條款寫清楚，違約怎麼處理雙方照約定走，你沒有額外損失。',fx:{e:-2}});
+   return L;},
+  tip:()=>G.flags.depositOk?'事前多花的時間，換來事後不用吵架。':'訂金收據要寫清楚違約條款。透過房仲成交，會先用斡旋金或要約書，再加上代書和履約保證，規則一開始就講清楚。'},
+ {id:'overtime',day:10,scene:'office',who:{sp:'mgr',name:'部門主管',title:'專案結案'},
+  pre:[{t:'專案結案前，主管要大家留下來加班。這時 LINE 跳出三則看屋詢問，其中一位說今晚就想看。'}],
+  q:'今晚怎麼安排？',
+  opts:[
+   {k:'mid',t:'留下來加班，房子的事回家再說。',j:4,e:-10,fb:'回到家已經 11 點，那位買方已讀不回了。',tip:'錯過買方的第一時間，熱度很快就冷掉。'},
+   {k:'mid',t:'準時下班，趕回家帶看。',j:-14,e:-12,fb:'對方看了 10 分鐘就說「再考慮」。主管在群組裡標記你。',tip:'為了一組不確定的買方犧牲工作，常常兩頭落空。'},
+   {k:'mid',t:'加班到 9 點，再約對方 10 點看。',e:-20,late:1,fb:'看完房快 11 點，你累到直接在沙發上睡著。',tip:'把帶看塞進下班後，體力會被一天一天榨乾。'}]},
+ {id:'key',day:11,scene:'office',who:{sp:'lin',name:'林媽媽',title:'來電'},
+  pre:[{who:'林媽媽（電話）：',t:'我想白天帶兒子去看。你上班不方便的話，鑰匙放管理室，我們自己進去看就好啦。'}],
+  q:'要怎麼回林媽媽？',
+  opts:[
+   {k:'bad',trap:1,t:'好啊，鑰匙放管理室，省得我又請假。',set:'lentKey',linDay:11,fb:'你鬆了一口氣，終於不用再請假了。'},
+   {k:'good',t:'請一天假，親自帶看。',j:-14,leave:1,linDay:11,fb:{who:'主管：',t:'你這個月已經請第幾次假了？'},tip:'親自帶看安全多了，但代價是你的假和主管的耐心。'},
+   {k:'mid',t:'請她改到週末再來看。',heart:{lin:-10},linDay:15,fb:{who:'林媽媽：',t:'週末喔……我兒子不一定有空耶。'},tip:'買方的時間往後拖，熱度就往下掉。'}]},
+ {id:'keyconseq',day:()=>G.linDay,when:()=>G.flags.lentKey,kind:'narr',scene:'night',who:{sp:'house',name:'你的房子',title:'被翻過'},
+  lines:[{t:'晚上回家，你發現他們帶了裝潢師傅進來量尺寸。地上都是鞋印，浴室門把也被弄鬆了。',fx:{e:-8,loss:0.5,lossLabel:'門把維修、清潔'}},{who:'林媽媽（LINE）：',t:'房子我們看過了，明天再約你當面談喔！'}],
+  tip:'把鑰匙交給不熟的人自行看屋，屋況和安全都沒人顧。房仲帶看會全程陪同，並登記看屋的人。'},
+ {id:'vlin',day:()=>G.linDay+(G.flags.lentKey?1:0),kind:'view',buyer:'lin'},
+ {id:'loan',day:()=>G.day,when:()=>G.flags.linDeal,scene:'home',who:{sp:'lin',name:'林媽媽',title:'想買'},
+  pre:[{who:'林媽媽：',t:'這間我要了！不過我要跟銀行貸八成喔，應該沒問題啦。'}],
+  q:'簽約前，貸款的事要怎麼處理？',
+  opts:[
+   {k:'bad',trap:1,t:'她說沒問題，那就直接簽約吧。',set:'noLoan',fb:'簽約很順利，你總算鬆了一口氣。'},
+   {k:'good',t:'請她先找銀行預審，合約也寫清楚貸款不足時怎麼處理。',e:-8,set:'loanOk',fb:'多跑了兩趟銀行和代書，但心裡踏實多了。',tip:'買方貸款成數沒確認，是交易中途破局最常見的原因之一。'}],
+  post:()=>{if(G.flags.loanOk)G.sold={id:'lin',...G.offers.lin};}},
+ {id:'loanfail',day:()=>G.day+1,when:()=>G.flags.linDeal&&G.flags.noLoan,kind:'narr',scene:'night',who:{sp:'lin',name:'林媽媽',title:'貸款卡關'},
+  lines:[{t:'銀行估價比成交價低，林媽媽只貸得到六成五，差額拿不出來。'},{who:'林媽媽：',t:'貸款不夠我也沒辦法，那就解約吧！'},
+   {t:'你們為了解約條件吵了一個禮拜，你晚上都睡不好。',fx:{e:-18,j:-8,late:1,fight:1}}],
+  tip:'簽約前要先確認買方貸款，並約定貸款不足時怎麼處理。房仲成交時會先幫你把關買方的資金。',
+  post:()=>{G.flags.linDeal=false;}},
+ {id:'tired',day:()=>weekday(Math.max(14,G.day)),scene:'office',who:{sp:'mgr',name:'部門主管',title:'皺眉中'},
+  pre:[{t:'連續兩週，下班就趕回家整理房子、回訊息、帶看。今天開會時你打了一個大哈欠，剛好被主管看到。',fx:{j:-6}}],
+  q:'今晚你打算……',
+  opts:[
+   {k:'mid',t:'灌兩杯咖啡，繼續撐。',e:-8,fb:'你撐住了，但半夜心跳很快，怎麼樣都睡不著。',tip:'賣房常常要拖一、兩個月，屋主的體力和本業都是隱形成本。'},
+   {k:'good',t:'請一天假，在家好好睡一覺。',j:-12,e:24,leave:1,fb:'睡飽了，但桌上的工作也堆了一整天。',tip:'賣房常常要拖一、兩個月，屋主的體力和本業都是隱形成本。'},
+   {k:'bad',t:'熬夜把所有買方訊息回完。',e:-16,late:1,fb:'回到凌晨兩點，隔天上班眼睛都睜不開。',tip:'賣房常常要拖一、兩個月，屋主的體力和本業都是隱形成本。'}]},
+ {id:'vboss',day:16,when:()=>!G.sold,kind:'view',buyer:'boss'},
+ // ---- 成交後：簽約與交屋 ----
+ {id:'fees',day:()=>weekday(Math.max(17,G.day)),when:()=>!!G.sold,scene:'office',who:{sp:'doc',name:'買賣契約',title:'簽約前一天'},
+  pre:[{who:'買方：',t:'代書費、規費、契稅，還有這期的房屋稅和地價稅，各自誰付？'}],
+  q:'你要怎麼回答？',
+  opts:[
+   {k:'bad',trap:1,t:'隨便啦，到時候再說。',set:'feeVague',fb:'買方皺了皺眉頭，沒再多說什麼。'},
+   {k:'good',t:'熬夜查資料，自己列一張費用分擔表。',e:-12,late:1,fb:'查到半夜兩點，總算弄懂哪些該誰付。',tip:'買賣雙方各付哪些費用有慣例，房仲和代書會在簽約前列清楚。'},
+   {k:'mid',t:'問問朋友，照朋友說的分。',e:-3,loss:1,lossLabel:'多付了不用你付的規費',fb:'朋友說得不太準，你多付了一筆其實不用你付的錢。',tip:'聽說來的「慣例」不一定對，費用分擔要寫進合約。'}]},
+ {id:'feeconseq',day:17,when:()=>!!G.sold&&G.flags.feeVague,kind:'narr',scene:'office',who:{sp:'doc',name:'簽約現場',title:'吵起來了'},
+  lines:[{t:'簽約當天，雙方為了幾萬塊的費用吵了兩個小時，差點簽不成。最後你讓步了。',fx:{e:-12,loss:2,lossLabel:'簽約時讓步的費用',fight:1}}],
+  tip:'費用分擔沒先講清楚，簽約當天最容易吵起來。'},
+ {id:'tax',day:18,when:()=>!!G.sold,scene:'night',who:{sp:'doc',name:'稅單',title:'實拿多少？'},
+  pre:[{t:'簽完約，你開始算實際能拿到多少錢。這才想到：土地增值稅、房地合一稅……'}],
+  q:'稅的事要怎麼處理？',
+  opts:[
+   {k:'bad',trap:1,t:'不用算了，賣多少就拿多少吧。',set:'noTax',fb:'你決定先不管，之後再說。'},
+   {k:'good',t:'請一天假，去問國稅局和代書，把稅算清楚。',j:-12,e:-6,leave:1,fb:'你發現符合條件可以申請自用住宅的優惠稅率，及時準備好文件。',tip:'稅金要事先試算，符合條件的優惠要主動申請。'}]},
+ {id:'disclose',day:()=>weekday(Math.max(19,G.day)),when:()=>!!G.sold,scene:'office',who:{sp:'doc',name:'現況說明書',title:'代書請你填'},
+  pre:[{t:'代書請你填「不動產現況說明書」。三年前浴室漏過水，後來有修好。'}],
+  q:'這件事要寫進去嗎？',
+  opts:[
+   {k:'bad',trap:1,t:'已經修好了，不用寫吧。',set:'hideLeak',fb:'你在「是否曾經漏水」那一欄勾了「否」。'},
+   {k:'good',t:'照實寫，附上當時的修繕紀錄。',e:-4,fb:'買方看了紀錄，反而覺得你很誠實。',tip:'知道的瑕疵要告知，有修繕紀錄更好，交屋後才不會被追究。'}]},
+ {id:'handover',day:21,when:()=>!!G.sold,scene:'home',who:{sp:'house',name:'交屋',title:'最後一天'},
+  pre:[{t:'交屋前一天，你準備把客廳的冷氣拆下來帶去新家。不過看房時，你好像隨口說過「冷氣可以留下來」。'}],
+  q:'冷氣要怎麼處理？',
+  opts:[
+   {k:'bad',trap:1,t:'帶走啊，合約上又沒寫。',set:'acGone',fb:'你請師傅把冷氣拆了。'},
+   {k:'good',t:'先打給買方確認，把要留下的家電寫成點交清單。',e:-4,fb:'買方很感謝你主動確認。',tip:'哪些家具家電要留下，要寫成清單。口頭說過的話最容易起爭執。'}]},
+ {id:'acconseq',day:21,when:()=>!!G.sold&&G.flags.acGone,kind:'narr',scene:'home',who:{sp:'house',name:'交屋現場',title:'卡關'},
+  lines:[{who:'買方：',t:'看房時你明明說冷氣會留下來！'},{t:'雙方各說各話，交屋卡了三個小時。最後你自掏腰包買了一台新的裝回去。',fx:{e:-10,loss:3,lossLabel:'補裝一台冷氣',fight:1}}],
+  tip:'哪些家具家電要留下，要寫成清單。口頭說過的話最容易起爭執。'},
+ {id:'leakconseq',day:21,when:()=>!!G.sold&&G.flags.hideLeak,kind:'narr',scene:'night',who:{sp:'phone',name:'買方',title:'交屋後兩個月'},
+  lines:()=>[{t:'交屋兩個月後，你的手機響了。'},{who:'買方（電話）：',t:'浴室又在滲水了！你之前根本沒說過漏水的事！'},
+   {t:'買方認為你隱瞞瑕疵，要求你負擔修繕費用。',fx:{e:-12,loss:Math.max(10,Math.round(G.ask*0.012)),lossLabel:'隱瞞漏水被求償（遊戲估算）',fight:1}}],
+  tip:'知道的瑕疵沒告知，交屋後可能被要求賠償。'},
+ {id:'taxconseq',day:21,when:()=>!!G.sold&&G.flags.noTax,kind:'narr',scene:'night',who:{sp:'doc',name:'稅單',title:'來了'},
+  lines:()=>[{t:'稅單寄來，要繳的稅比你想像中多。自用住宅的優惠要在申報時就提出，你錯過了。',fx:{loss:Math.max(8,Math.round(G.ask*0.015)),lossLabel:'錯過稅金優惠（遊戲估算）'}}],
+  tip:'稅金沒事先試算，實拿金額很容易跟想像差一大截。'}
+];
+
+/* ================== 音效（WebAudio 合成） ================== */
+const Snd={ctx:null,on:true,timer:null,seq:null,cur:null,
+ init(){if(!this.ctx){try{this.ctx=new (window.AudioContext||window.webkitAudioContext)();}catch(e){this.on=false;}}if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();},
+ f(m){return 440*Math.pow(2,(m-69)/12);},
+ tone(m,t,dur,type='square',vol=.05){if(!this.ctx||!this.on||!m)return;const c=this.ctx,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.value=this.f(m);
+   g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0005,t+dur*.95);o.connect(g).connect(c.destination);o.start(t);o.stop(t+dur);},
+ sfx(name){if(!this.ctx||!this.on)return;const t=this.ctx.currentTime;
+   const S={sel:[[84,.05]],hit:[[72,.06],[79,.06],[84,.1]],crit:[[76,.05],[79,.05],[84,.05],[88,.05],[91,.16]],bad:[[50,.12,'sawtooth'],[45,.2,'sawtooth']],drop:[[67,.08],[62,.08],[55,.14]],
+     win:[[72,.1],[76,.1],[79,.1],[84,.3]],lose:[[67,.15],[63,.15],[60,.15],[55,.4]],type:[[96,.015]],fan:[[72,.12],[72,.12],[72,.12],[79,.4],[77,.12],[79,.12],[84,.5]],
+     ring:[[88,.06],[84,.06],[88,.06],[84,.06]],day:[[79,.08],[84,.12]],fight:[[45,.08,'sawtooth'],[52,.08,'sawtooth'],[45,.08,'sawtooth'],[40,.25,'sawtooth']]}[name]||[];
+   let tt=t;S.forEach(([m,d,ty])=>{this.tone(m,tt,d+.02,ty||'square',name==='type'?.018:.06);tt+=d;});},
+ songs:{
+  title:{bpm:132,mel:[72,1,76,1,79,1,84,2,79,1,81,2,79,1,76,1,77,1,79,2,0,1,72,1,76,1,79,1,84,2,86,1,84,2,79,1,76,1,74,1,72,3],bas:[48,2,48,2,53,2,55,2,48,2,48,2,53,2,55,2]},
+  day:{bpm:112,mel:[67,2,72,1,74,1,76,2,74,2,72,2,69,2,67,4,65,2,69,1,72,1,74,2,72,2,71,2,67,2,72,4],bas:[48,4,45,4,41,4,43,4]},
+  battle:{bpm:158,mel:[69,1,72,1,76,1,72,1,74,1,71,1,67,1,71,1,69,1,72,1,76,1,79,1,77,2,76,2,74,1,72,1,71,1,74,1,72,1,69,1,71,1,68,1,69,4],bas:[45,2,45,2,43,2,43,2,41,2,41,2,40,2,40,2]},
+  boss:{bpm:170,mel:[64,1,64,1,71,1,64,1,72,1,64,1,71,1,69,1,64,1,64,1,71,1,64,1,74,1,72,1,71,1,67,1],bas:[40,1,40,1,52,1,40,1,40,1,52,1,40,1,51,1]}},
+ play(name){if(this.cur===name&&this.seq)return;this.stop();this.cur=name;if(!this.ctx||!this.on)return;const s=this.songs[name];const step=60/s.bpm/2;
+   const st={mi:0,bi:0,mt:this.ctx.currentTime+.08,bt:this.ctx.currentTime+.08};this.seq=st;
+   const tick=()=>{if(this.seq!==st)return;const now=this.ctx.currentTime;
+     while(st.mt<now+.25){const m=s.mel[st.mi],d=s.mel[st.mi+1]*step;this.tone(m,st.mt,d*.9,'square',.03);st.mt+=d;st.mi=(st.mi+2)%s.mel.length;}
+     while(st.bt<now+.25){const m=s.bas[st.bi],d=s.bas[st.bi+1]*step;this.tone(m,st.bt,d*.9,'triangle',.065);st.bt+=d;st.bi=(st.bi+2)%s.bas.length;}};
+   tick();this.timer=setInterval(tick,60);},
+ stop(){clearInterval(this.timer);this.seq=null;},
+ toggle(){this.on=!this.on;try{localStorage.setItem('kj_snd',this.on?'1':'0');}catch(e){}
+   if(!this.on)this.stop();else{this.init();const c=this.cur;this.cur=null;if(c)this.play(c);}renderSndBtns();}
+};
+try{if(localStorage.getItem('kj_snd')==='0')Snd.on=false;}catch(e){}
+function renderSndBtns(){document.querySelectorAll('.snd-btn').forEach(b=>{b.textContent='音效 '+(Snd.on?'開':'關');b.setAttribute('aria-pressed',String(Snd.on));});}
+
+/* ================== 狀態與工具 ================== */
+const $=s=>document.querySelector(s);
+const RM=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
+let G={};
+function newGame(){G={ask:G.ask||1200,type:G.type||'大樓',day:1,E:100,J:100,kit:2,flags:{},heartMod:{},offers:{},sold:null,linDay:11,si:0,
+  stats:{leave:0,late:0,views:0,fights:0,traps:0},picks:[],losses:[],busy:false,end:null};}
+newGame();
+const fmt=n=>Math.round(n).toLocaleString('zh-TW');
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;};
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.hidden=(s.id!==id));}
+
+/* ---------- 對話框 ---------- */
+let typing=null,waiter=null;
+function say(who,text,done){
+  $('#d-who').textContent=who||'';const el=$('#d-txt');el.textContent='';$('#d-more').hidden=true;
+  if(typing)clearInterval(typing.iv);typing=null;
+  if(RM){el.textContent=text;done&&done();return;}
+  let i=0;const tp={text,done,iv:null};typing=tp;
+  tp.iv=setInterval(()=>{i++;el.textContent=text.slice(0,i);if(i%3===0)Snd.sfx('type');
+    if(i>=text.length){clearInterval(tp.iv);typing=null;done&&done();}},24);
+}
+function sayLines(lines,done){let i=0;
+  const step=()=>{const L=lines[i];if(L.fx)applyFx(L.fx);say(L.who||'',L.t,()=>{i++;if(i<lines.length){$('#d-more').hidden=false;waiter=step;}else done();});};
+  step();}
+function dialogTap(){if(typing){clearInterval(typing.iv);$('#d-txt').textContent=typing.text;const d=typing.done;typing=null;d&&d();return;}
+  if(waiter){const w=waiter;waiter=null;$('#d-more').hidden=true;Snd.sfx('sel');w();}}
+$('#dialog').addEventListener('click',dialogTap);
+$('#dialog').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();dialogTap();}});
+
+/* ---------- 畫面元件 ---------- */
+function setScene(scene,who,viewing){
+  $('#arena').dataset.scene=scene||'home';
+  const cv=$('#npc-cv');if(who&&who.sp){cv.hidden=false;drawSprite(cv,SPR[who.sp]);}else cv.hidden=true;
+  $('#npc-name').innerHTML='';const nm=document.createElement('span');nm.textContent=who?who.name:'';const sm=document.createElement('small');sm.textContent=who&&who.title||'';
+  $('#npc-name').append(nm,sm);$('#npc-meter').hidden=!viewing;
+}
+function updateBars(){
+  $('#e-bar').style.width=G.E+'%';$('#e-num').textContent=G.E;$('#e-wrap').classList.toggle('low',G.E<30);
+  $('#j-bar').style.width=G.J+'%';$('#j-num').textContent=G.J;$('#j-wrap').classList.toggle('low',G.J<30);
+  if(G.heart!=null){$('#heart-bar').style.width=G.heart+'%';$('#heart-num').textContent=G.heart;}
+  if(G.pct!=null)$('#price-num').textContent=fmt(G.ask*G.pct/100)+'萬';
+  drawSprite($('#me-cv'),G.E<40?SPR.meTired:SPR.me);
+}
+function updateHud(){$('#hud-day').textContent=`DAY ${G.day}/${CONFIG.days}`;}
+function setHudTitle(t){$('#hud-title').textContent=`週${DOW[(G.day-1)%7]}・${t}`;}
+let floatN=0;
+function floatTxt(cls,text,x,y){const s=document.createElement('span');s.className='float '+cls;s.textContent=text;s.style.left=x;
+  s.style.top=`calc(${y} + ${(floatN++%3)*18}px)`;$('#arena').appendChild(s);setTimeout(()=>s.remove(),1350);}
+function banner(text,red){const b=document.createElement('div');b.className='crit-banner'+(red?' red':'');b.textContent=text;$('#arena').appendChild(b);setTimeout(()=>b.remove(),1000);}
+function shakeEl(el){if(RM)return;el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');}
+function applyFx(fx){
+  if(!fx)return;
+  if(fx.e){G.E=clamp(G.E+fx.e,0,100);floatTxt(fx.e>0?'ok':'down',`體力 ${fx.e>0?'+':''}${fx.e}`,'6%','46%');}
+  if(fx.j){G.J=clamp(G.J+fx.j,0,100);floatTxt(fx.j>0?'blue':'down',`工作 ${fx.j>0?'+':''}${fx.j}`,'6%','46%');if(fx.j<0)Snd.sfx('drop');}
+  if(fx.leave)G.stats.leave+=fx.leave;
+  if(fx.late)G.stats.late+=fx.late;
+  if(fx.fight){G.stats.fights+=fx.fight;banner('起衝突了！',true);Snd.sfx('fight');shakeEl($('#arena'));}
+  if(fx.loss){G.losses.push({label:fx.lossLabel||'額外支出',amt:fx.loss});floatTxt('down',`-${fx.loss}萬`,'30%','20%');}
+  if(fx.set)[].concat(fx.set).forEach(f=>G.flags[f]=true);
+  if(fx.heart)for(const k in fx.heart)G.heartMod[k]=(G.heartMod[k]||0)+fx.heart[k];
+  if(fx.linDay)G.linDay=fx.linDay;
+  updateBars();
+}
+function hidePanels(){$('#choices').hidden=true;$('#timing').hidden=true;$('#next-row').hidden=true;$('#tip').hidden=true;renderKit();}
+function showTip(tag,text){const t=$('#tip');t.innerHTML='';if(!text){t.hidden=true;return;}const b=document.createElement('b');b.textContent=tag;t.append(b,' '+text);t.hidden=false;}
+function nextBtn(label,fn){$('#next-btn').textContent=label;$('#next-row').hidden=false;G.after=fn;G.busy=false;$('#next-btn').focus({preventScroll:true});}
+$('#next-btn').addEventListener('click',()=>{if(!G.after)return;Snd.sfx('sel');const f=G.after;G.after=null;$('#next-row').hidden=true;f();});
+function costText(o){const a=[];if(o.e)a.push(`體力 ${o.e>0?'+':''}${o.e}`);if(o.j)a.push(`工作 ${o.j>0?'+':''}${o.j}`);if(o.leave)a.push(`請假 ${o.leave} 天`);return a.join('・');}
+function showChoices(opts,onPick,showCost){
+  const box=$('#choices');box.innerHTML='';G.curOpts=shuffle(opts);
+  G.curOpts.forEach(o=>{const b=document.createElement('button');b.type='button';b.className='opt';b.textContent=o.t;
+    const c=showCost&&costText(o);if(c){const s=document.createElement('span');s.className='cost';s.textContent=c;b.appendChild(s);}
+    b.addEventListener('click',()=>{if(G.busy)return;G.busy=true;Snd.sfx('sel');box.hidden=true;renderKit();onPick(o);});box.appendChild(b);});
+  box.hidden=false;G.busy=false;renderKit();
+}
+function renderKit(){const b=$('#kit-btn');b.textContent='求救 Ryan ×'+G.kit;
+  b.disabled=G.kit<=0||$('#choices').hidden||!(G.curOpts||[]).some(o=>o.k==='good');}
+$('#kit-btn').addEventListener('click',()=>{if(G.kit<=0||$('#choices').hidden)return;
+  const btns=[...document.querySelectorAll('#choices .opt')];const gi=(G.curOpts||[]).findIndex(o=>o.k==='good');
+  if(gi<0||btns[gi].classList.contains('kit'))return;G.kit--;btns[gi].classList.add('kit');Snd.sfx('ring');renderKit();
+  $('#d-who').textContent='Ryan（電話）：';$('#d-txt').textContent='這題我會這樣處理，你參考看看。';});
+
+/* ---------- 疊層 ---------- */
+function overlay(html,btnText,cb){const ov=$('#overlay'),box=$('#ov-box');box.innerHTML=html;
+  const b=document.createElement('button');b.className='btn';b.type='button';b.textContent=btnText;box.appendChild(b);ov.hidden=false;
+  b.focus({preventScroll:true});b.addEventListener('click',()=>{Snd.sfx('sel');ov.hidden=true;cb();},{once:true});}
+function calHtml(){let s='<div class="cal" aria-hidden="true">';for(let d=1;d<=CONFIG.days;d++)s+=`<span class="${d<G.day?'past':d===G.day?'today':''}">${d}</span>`;return s+'</div>';}
+function dayCard(nights,cb){
+  const gain=Math.min(100-G.E,nights*3);G.E+=gain;updateBars();updateHud();Snd.sfx('day');
+  overlay(`<div class="ov-k">週${DOW[(G.day-1)%7]}</div><div class="day-big">DAY ${G.day}</div>${calHtml()}
+    <p class="ov-p">${gain>0?`睡了 ${nights} 晚，體力恢復 ${gain}`:'沒時間休息，直接開始'}</p>`,'繼續',cb);
+}
+
+/* ================== 流程引擎 ================== */
+const dayOf=s=>typeof s.day==='function'?s.day():s.day;
+function run(){
+  if(G.E<=0)return finish('collapse');if(G.J<=0)return finish('job');
+  while(G.si<STEPS.length&&STEPS[G.si].when&&!STEPS[G.si].when())G.si++;
+  if(G.si>=STEPS.length)return finish(G.sold?'sold':'unsold');
+  const s=STEPS[G.si];const d=Math.max(dayOf(s),G.day);
+  hidePanels();
+  if(d>G.day){const n=d-G.day;G.day=d;dayCard(n,()=>exec(s));}else exec(s);
+}
+function nextStep(){G.si++;run();}
+function exec(s){
+  updateHud();
+  if(s.kind==='view')return startView(s.buyer);
+  Snd.play('day');
+  setScene(s.scene,s.who,false);G.heart=null;G.pct=null;updateBars();
+  setHudTitle(s.who?s.who.title:'');
+  if(s.who&&s.who.sp==='phone')Snd.sfx('ring');
+  if(s.kind==='narr'){
+    const lines=typeof s.lines==='function'?s.lines():s.lines;
+    sayLines(lines,()=>{const tip=typeof s.tip==='function'?s.tip():s.tip;if(tip){showTip('提醒：',tip);G.picks.push({k:'conseq',tip});}
+      nextBtn('繼續 ▶',()=>{s.post&&s.post();nextStep();});});
+    return;
+  }
+  sayLines([...(s.pre||[]),{t:s.q}],()=>showChoices(s.opts,o=>{
+    if(o.trap)G.stats.traps++;
+    applyFx(o);
+    const fb=typeof o.fb==='string'?{t:o.fb}:o.fb;
+    say(fb.who||'',fb.t,()=>{
+      if(o.tip){showTip(o.k==='good'?'好判斷：':'提醒：',o.tip);G.picks.push({k:o.k,tip:o.tip});}
+      nextBtn('繼續 ▶',()=>{s.post&&s.post();nextStep();});
+    });
+  },true));
+}
+
+/* ================== 帶看（戰鬥） ================== */
+function startView(id){
+  const B=BUYERS[id];G.cur=id;G.heart=clamp(B.start+(G.heartMod[id]||0),5,95);G.pct=100;G.round=0;G.stats.views++;
+  G.rounds=B.rounds.slice();if(id==='wang'&&G.flags.adFake)G.rounds.splice(1,0,AD_ROUND);
+  setScene('home',{sp:id,name:B.name,title:B.title},true);setHudTitle('帶看 '+B.name);updateBars();
+  Snd.play(id==='boss'?'boss':'battle');
+  overlay(`<div class="ov-k">${id==='boss'?'BOSS':'帶看'}</div><canvas id="ov-cv" class="px slide-in"></canvas>
+    <div class="ov-h">${B.title} ${B.name}<br>來看房了！</div><p class="ov-p">${B.intro}</p><p class="ov-p" style="color:var(--mute);font-size:13px">看屋時被挑剔，回話太衝可能起衝突。你越累，越容易失控。</p>`,'開門迎接',()=>{
+    applyFx({e:-5});floatTxt('gold','打掃家裡','6%','30%');
+    if(id==='boss'&&G.flags.floor){
+      sayLines([{who:'黑董：',t:'我聽說你電話裡講過九折可以談。那我們就從那裡開始吧。'}],()=>{G.pct=95;floatTxt('down',`-${fmt(G.ask*.05)}萬`,'6%','30%');updateBars();
+        showTip('提醒：','電話裡隨口說的底價，已經傳到別的買方耳裡了。');G.picks.push({k:'conseq',tip:'底價一說出口就收不回來，消息還可能傳到其他買方耳裡。'});
+        nextBtn('開始談 ▶',viewRound);});
+    }else viewRound();
+  });
+  drawSprite($('#ov-cv'),SPR[id]);
+}
+function viewRound(){
+  const B=BUYERS[G.cur],R=G.rounds[G.round];hidePanels();
+  setHudTitle(`帶看 ${B.name}・${G.round+1}/${G.rounds.length}`);
+  shakeEl($('#npc-cv'));
+  say(B.name+'：',R.say,()=>showChoices(R.opts,o=>pickView(o,R),false));
+}
+let tAnim=null,tAuto=null;
+function pickView(o,R){
+  G.pending={o,R};
+  if(RM){return resolveView(o,R,1,'good');}
+  $('#timing').hidden=false;const nd=$('#needle');const t0=performance.now();
+  const speed=1/(G.cur==='boss'?0.6:0.78)*(G.E<40?1.25:1);
+  const loop=now=>{const x=((now-t0)/1000*speed)%2;const pos=x<1?x:2-x;G.tpos=pos;nd.style.left=(pos*100)+'%';tAnim=requestAnimationFrame(loop);};
+  tAnim=requestAnimationFrame(loop);clearTimeout(tAuto);tAuto=setTimeout(fire,4500);
+  $('#fire-btn').focus({preventScroll:true});
+}
+function fire(){
+  if($('#timing').hidden)return;cancelAnimationFrame(tAnim);clearTimeout(tAuto);
+  const d=Math.abs((G.tpos??.5)-.5);const zone=d<.08?'perfect':d<.22?'good':'miss';const m=zone==='perfect'?1.5:zone==='good'?1:.75;
+  $('#timing').hidden=true;setTimeout(()=>resolveView(G.pending.o,G.pending.R,m,zone),150);
+}
+$('#fire-btn').addEventListener('click',fire);$('#tbar').addEventListener('click',fire);
+function resolveView(o,R,m,zone){
+  const B=BUYERS[G.cur];
+  let h=o.h,p=o.p;
+  if(h>0)h=Math.round(h*m);else h=Math.round(h*(zone==='perfect'?.6:zone==='miss'?1.2:1));
+  if(p<0)p=zone==='perfect'?p*.5:zone==='miss'?p*1.3:p;p=Math.round(p*10)/10;
+  // 衝突判定：看屋挑剔的回合，屋主越累越容易起衝突
+  let conflict=false;
+  if(R.type==='view'){const base={good:0,mid:.06,bad:.5}[o.k];const pc=base+(100-G.E)/100*(o.k==='good'?.18:.4);conflict=Math.random()<pc;}
+  if(conflict)h-=20;
+  G.heart=clamp(G.heart+h,0,100);G.pct=Math.max(50,+(G.pct+p).toFixed(1));
+  G.picks.push({k:o.k,tip:o.tip});
+  if(zone==='perfect')banner(o.k==='bad'?'穩住了！':'會心一擊！');else if(zone==='miss')banner('氣勢不足…');
+  if(h>0){Snd.sfx(zone==='perfect'?'crit':'hit');const bc=$('#npc-cv');bc.classList.remove('flash');void bc.offsetWidth;if(!RM)bc.classList.add('flash');floatTxt('up','意願 +'+h,'56%','8%');}
+  else{Snd.sfx('bad');shakeEl($('#arena'));floatTxt('down','意願 '+h,'56%','8%');}
+  if(p<0)setTimeout(()=>{Snd.sfx('drop');floatTxt('down',`-${fmt(-p*G.ask/100)}萬`,'6%','40%');},300);
+  updateBars();
+  setTimeout(()=>{
+    const lines=conflict?[{who:'你：',t:o.k==='good'?'（你太累了，語氣不小心衝了一點……）':'（你忍不住提高了音量）',fx:{e:-8,fight:1}},{who:B.name+'：',t:B.angry}]:[{who:B.name+'：',t:o.fb}];
+    sayLines(lines,()=>{
+      const tag=conflict?'起衝突：':o.k==='good'?'好招！':o.k==='mid'?'價格失守：':'踩到地雷：';
+      showTip(tag,conflict?(G.E<50?'你已經很累了，被挑剔時特別容易失控。賣房拖越久，屋主的情緒越難顧。':o.tip):o.tip);
+      if(conflict)G.picks.push({k:'conseq',tip:'帶看時被挑剔很正常。屋主越累越容易跟買方吵起來，一吵，買方就走了。'});
+      G.round++;
+      const end=G.heart>=100||G.heart<=0||G.round>=G.rounds.length;
+      nextBtn(end?'看結果 ▶':'下一回合 ▶',end?endView:viewRound);
+    });
+  },600);
+}
+function endView(){
+  const B=BUYERS[G.cur],id=G.cur;hidePanels();
+  const deal=G.heart>=60;const price=G.ask*G.pct/100;
+  if(G.E<=0||G.J<=0){return run();}
+  if(deal){
+    G.offers[id]={pct:G.pct,price,name:B.name};
+    if(id==='wang')G.flags.wangDeal=true;if(id==='lin')G.flags.linDeal=true;if(id==='boss')G.sold={id,pct:G.pct,price,name:B.name};
+    Snd.sfx('win');
+    overlay(`<div class="ov-k">${id==='boss'?'DEAL!':'GOOD!'}</div><canvas id="ov-cv" class="px"></canvas><div class="ov-h">${B.name}說想買！</div>
+      <div class="ov-big"><span class="num">${fmt(price)}</span> 萬</div>
+      <p class="ov-p">守住開價的 ${G.pct}%。${id==='boss'?'接下來是簽約和交屋，自己來。':'不過，事情還沒結束……'}</p>`,'繼續',()=>{G.heart=null;nextStep();});
+    drawSprite($('#ov-cv'),SPR[id]);
+  }else{
+    Snd.sfx('lose');
+    overlay(`<div class="ov-k">BUYER LEFT</div><canvas id="ov-cv" class="px" style="opacity:.6;transform:scaleX(-1)"></canvas><div class="ov-h">${B.name}走了……</div>
+      <p class="ov-p">${G.heart<=0?'買方被你嚇跑了。真心想買的人，可能就這樣錯過。':'聊完一輪，對方還是沒心動，決定再看看別間。'}</p>`,'繼續',()=>{G.heart=null;nextStep();});
+    drawSprite($('#ov-cv'),SPR[id]);
+  }
+}
+
+/* ================== 結算 ================== */
+function finish(reason){
+  G.end=reason;Snd.stop();Snd.cur=null;
+  const msgs={collapse:['你累倒了','連續熬夜加上工作壓力，你發燒請了三天病假，只好先暫停賣房。'],
+    job:['主管找你約談','「你最近的狀況真的不行，要不要先把私事處理好？」你只好先暫停賣房。'],
+    unsold:['房子沒賣出去','三組買方都沒談成，房子還在 591 上掛著。'],
+    sold:['交屋完成！','房子終於賣掉了。你看著空蕩蕩的客廳，只想好好睡一覺。']};
+  const [h,p]=msgs[reason];
+  Snd.sfx(reason==='sold'?'fan':'lose');
+  overlay(`<div class="ov-k">DAY ${G.day} · ${reason==='sold'?'CLEAR':'GAME OVER'}</div><canvas id="ov-cv" class="px"></canvas><div class="ov-h">${h}</div><p class="ov-p">${p}</p>`,'看總成績',showResult);
+  drawSprite($('#ov-cv'),reason==='sold'?SPR.house:SPR.meTired);
+}
+function computeResult(){
+  const S=G.stats,sold=G.sold;const lossSum=G.losses.reduce((a,l)=>a+l.amt,0);
+  let score=0;if(sold){score+=30+clamp((sold.pct-85)/15,0,1)*20;}
+  score+=G.E/100*15+G.J/100*15-S.traps*5-S.fights*3;
+  let g=score>=62?'S':score>=48?'A':score>=34?'B':score>=20?'C':'D';
+  if(!sold&&(g==='S'||g==='A'||g==='B'))g='C';
+  const T={S:['自售高手','房子賣了，工作也顧住了。不過你應該最清楚，這 21 天有多累。'],A:['硬撐過關','成交了，但體力和工作都被扣了不少分。'],
+    B:['蠟燭兩頭燒','房子和工作兩頭跑，好幾次差點撐不住。'],C:['心力交瘁','踩了不少雷，錢和力氣都花在不該花的地方。'],D:['白忙一場','三組買方都沒談成，房子還掛在網路上，人也累壞了。']};
+  let [title,desc]=T[g];
+  if(G.end==='collapse'){title='累倒在半路';desc='身體先撐不住了。自己賣房，最先被消耗的是你自己。';}
+  if(G.end==='job'){title='工作亮紅燈';desc='請假、分心、加班，主管的耐心先用完了。';}
+  return {g,title,desc,sold,lossSum,score:Math.round(score)};
+}
+function statHtml(l,v,cls){return `<div class="stat ${cls||''}"><div class="l">${l}</div><div class="v">${v}</div></div>`;}
+function showResult(){
+  Snd.play('title');show('scr-result');$('#scr-result').scrollTop=0;
+  const R=computeResult();G.result=R;const S=G.stats;
+  $('#r-grade').textContent=R.g;$('#r-title').textContent=R.title;$('#r-desc').textContent=R.desc;
+  let h='';
+  if(R.sold){h+=statHtml('成交價',`<span class="num">${fmt(R.sold.price)}</span> 萬`);h+=statHtml('守住開價',`<span class="num">${R.sold.pct}</span>%`);
+    h+=statHtml('扣掉糾紛和失誤，實拿約',`<span class="num">${fmt(R.sold.price-R.lossSum)}</span> 萬`,'wide');}
+  else h+=statHtml('結果','房子沒賣出去','wide bad');
+  h+=statHtml('請假',`<span class="num">${S.leave}</span> 天`,S.leave>=2?'bad':'');
+  h+=statHtml('熬夜',`<span class="num">${S.late}</span> 次`,S.late>=2?'bad':'');
+  h+=statHtml('親自帶看',`<span class="num">${S.views}</span> 組`);
+  h+=statHtml('吵架、糾紛',`<span class="num">${S.fights}</span> 次`,S.fights?'bad':'');
+  h+=statHtml('剩下的體力',`<span class="num">${G.E}</span>`,G.E<40?'bad':'');
+  h+=statHtml('工作表現',`<span class="num">${G.J}</span>`,G.J<50?'bad':'');
+  $('#r-stats').innerHTML=h;
+  const lw=$('#r-loss-wrap');
+  if(G.losses.length){lw.hidden=false;$('#r-loss').innerHTML=G.losses.map(l=>`<div class="loss"><span>${l.label}</span><span class="r">-${l.amt<10?(+l.amt.toFixed(1)):fmt(l.amt)} 萬</span></div>`).join('');}
+  else lw.hidden=true;
+  const order={conseq:0,bad:1,mid:2};const seen=new Set();const ls=[];
+  G.picks.filter(p=>p.k!=='good').sort((a,b)=>order[a.k]-order[b.k]).forEach(p=>{if(!seen.has(p.tip)&&ls.length<4){seen.add(p.tip);ls.push(p.tip);}});
+  $('#r-lessons').innerHTML='';
+  if(ls.length)ls.forEach(t=>{const li=document.createElement('li');li.textContent=t;$('#r-lessons').appendChild(li);});
+  else{const li=document.createElement('li');li.textContent='幾乎零失誤！不過你也看到了，做對每件事要花多少假和體力。';$('#r-lessons').appendChild(li);}
+  let sent=false;try{sent=localStorage.getItem('kj_lead')==='1';}catch(e){}
+  $('#lock-form-wrap').hidden=sent;$('#lead-done').hidden=!sent;
+  setupLine();
+}
+
+/* ================== 留資料 ================== */
+const demo=!(CONFIG.firebase.apiKey&&CONFIG.firebase.projectId);
+const SRC=(()=>{try{return (new URLSearchParams(location.search).get('src')||'').slice(0,40);}catch(e){return '';}})();
+function lineMsg(){const R=G.result||{g:'-',title:''};return `你好 Ryan，我玩了「殺價魔王大作戰」拿到 ${R.g} 級（${R.title}）。我的房子是${G.type}，開價大約 ${fmt(G.ask)} 萬，想了解建議開價和委託方式。`;}
+function setupLine(){const b=$('#line-btn');
+  // 沒有接資料庫時，不顯示表單，改用 LINE 和電話取得聯繫
+  $('#lead-form').hidden=demo;$('#line-only').hidden=!demo;$('#demo-note').hidden=true;
+  if(CONFIG.lineId||CONFIG.linePersonal){b.disabled=false;b.textContent=demo?`加 Ryan 的 LINE（ID：${CONFIG.linePersonal||CONFIG.lineId}）`:'或直接傳 LINE 問 Ryan';}
+  else{b.disabled=true;}}
+function openLink(href){const a=document.createElement('a');a.href=href;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();}
+$('#line-btn').addEventListener('click',async()=>{
+  if(CONFIG.lineId)return openLink(`https://line.me/R/oaMessage/${encodeURIComponent(CONFIG.lineId)}/?${encodeURIComponent(lineMsg())}`);
+  if(!CONFIG.linePersonal)return;
+  // 個人帳號無法預填訊息：先把訊息複製起來，加好友後貼上即可
+  let copied=false;try{await navigator.clipboard.writeText(lineMsg());copied=true;}catch(e){}
+  const h=$('#line-hint');h.hidden=false;h.textContent=copied?'已幫你複製一段訊息，加好友後直接貼上傳送就好。':`加好友後，傳「我要報告」給 Ryan 就可以了。`;
+  openLink(`https://line.me/ti/p/~${encodeURIComponent(CONFIG.linePersonal)}`);});
+function toFields(o){const f={};for(const[k,v]of Object.entries(o)){
+  if(v instanceof Date)f[k]={timestampValue:v.toISOString()};else if(typeof v==='boolean')f[k]={booleanValue:v};
+  else if(typeof v==='number')f[k]=Number.isInteger(v)?{integerValue:String(v)}:{doubleValue:v};else f[k]={stringValue:String(v)};}return f;}
+$('#lead-form').addEventListener('submit',async e=>{
+  e.preventDefault();const err=$('#lead-err');err.textContent='';
+  if($('#lead-web').value)return;
+  const name=$('#lead-name').value.trim(),raw=$('#lead-contact').value.trim(),area=$('#lead-area').value.trim(),time=$('#lead-time').value;
+  if(!name){err.textContent='請填寫稱呼，Ryan 才知道怎麼稱呼你。';$('#lead-name').focus();return;}
+  const phone=raw.replace(/[\s-]/g,'');const okPhone=/^09\d{8}$/.test(phone),okLine=/^@?[A-Za-z0-9._-]{3,30}$/.test(raw);
+  if(!okPhone&&!okLine){err.textContent='請填 09 開頭的手機號碼，或你的 LINE ID。';$('#lead-contact').focus();return;}
+  if(!$('#lead-consent').checked){err.textContent='請勾選同意，我們才能把報告傳給你。';return;}
+  const R=G.result||{g:'-',sold:null};
+  const lead={name,contact:okPhone?phone:raw,area,time,price:Math.round(G.ask),type:G.type,grade:R.g,sold:!!R.sold,
+    leave:Math.round(G.stats.leave*10)/10,traps:G.stats.traps,src:SRC,consent:true,createdAt:new Date(),ua:navigator.userAgent.slice(0,120)};
+  const btn=$('#lead-submit');btn.disabled=true;btn.textContent='送出中…';
+  try{
+    if(!demo){
+      const url=`https://firestore.googleapis.com/v1/projects/${CONFIG.firebase.projectId}/databases/(default)/documents/${CONFIG.collection}?key=${CONFIG.firebase.apiKey}`;
+      const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:toFields(lead)})});
+      if(!r.ok)throw new Error('HTTP '+r.status);
+    }
+    try{localStorage.setItem('kj_lead','1');}catch(e){}
+    Snd.sfx('fan');$('#lock-form-wrap').hidden=true;$('#lead-done').hidden=false;
+  }catch(ex){err.textContent='網路好像不太穩，送出失敗。請再按一次，或改用 LINE 聯絡。';}
+  finally{btn.disabled=false;btn.textContent='免費取得我家的報告';}
+});
+
+/* ================== 開場與按鈕 ================== */
+function drawStatic(){
+  pixelText($('#title-cv'),['殺價魔王','大作戰'],20,'#F4CD3B','#E5483B',4);
+  drawSprite($('#t-me'),SPR.me);drawSprite($('#t-boss'),SPR.boss);
+  drawSprite($('#me-cv'),SPR.me);drawSprite($('#lock-cv'),SPR.lock);drawSprite($('#done-cv'),SPR.key);
+}
+drawStatic();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(drawStatic);
+renderSndBtns();
+window.addEventListener('resize',()=>fitTitle($('#title-cv')));
+document.querySelectorAll('.snd-btn').forEach(b=>b.addEventListener('click',()=>{Snd.init();Snd.toggle();}));
+$('#start-btn').addEventListener('click',()=>{Snd.init();Snd.sfx('sel');Snd.play('title');show('scr-setup');});
+function setPrice(v){G.ask=+v;$('#price-show').textContent=fmt(v);$('#price-range').value=v;
+  document.querySelectorAll('#price-chips .chip').forEach(c=>c.setAttribute('aria-pressed',String(+c.dataset.v===+v)));}
+$('#price-range').addEventListener('input',e=>setPrice(e.target.value));
+document.querySelectorAll('#price-chips .chip').forEach(c=>c.addEventListener('click',()=>{Snd.sfx('sel');setPrice(c.dataset.v);}));
+document.querySelectorAll('#type-chips .chip').forEach(c=>c.addEventListener('click',()=>{Snd.sfx('sel');G.type=c.dataset.v;
+  document.querySelectorAll('#type-chips .chip').forEach(x=>x.setAttribute('aria-pressed',String(x===c)));}));
+$('#go-btn').addEventListener('click',()=>{
+  Snd.sfx('sel');newGame();show('scr-play');setScene('home',null,false);updateBars();updateHud();setHudTitle('出發');
+  overlay(`<div class="ov-k">MISSION</div><canvas id="ov-cv" class="px"></canvas><div class="ov-h">不找仲介，自己賣！</div>
+    <p class="ov-p">你白天還要上班。21 天內把房子賣掉，同時別把身體和工作搞垮。</p>
+    <div class="ov-legend"><div><i style="background:var(--mint)"></i><span><b>體力</b>：帶看、熬夜、吵架都會消耗。歸零就累倒。</span></div>
+    <div><i style="background:#5d8fe0"></i><span><b>工作</b>：請假、分心會扣分。歸零主管就約談你。</span></div>
+    <div><i style="background:var(--gold)"></i><span><b>求救 Ryan</b>：卡關時打給 Ryan，共 2 次。</span></div></div>`,'開始第 1 天',run);
+  drawSprite($('#ov-cv'),SPR.me);
+});
+$('#copy-btn').addEventListener('click',async()=>{const b=$('#copy-btn');
+  try{await navigator.clipboard.writeText('0975-711-267');b.textContent='已複製';}
+  catch(e){const r=document.createRange();r.selectNodeContents($('#ph-num'));const sel=getSelection();sel.removeAllRanges();sel.addRange(r);b.textContent='已選取，長按即可複製';}
+  setTimeout(()=>b.textContent='複製號碼',2200);});
+$('#again-btn').addEventListener('click',()=>{Snd.sfx('sel');show('scr-setup');});
+$('#share-btn').addEventListener('click',async()=>{
+  const url=location.href.split('#')[0];const text='不找仲介自己賣房子，21 天你撐得住嗎？來玩「殺價魔王大作戰」';const b=$('#share-btn');
+  try{if(navigator.share){await navigator.share({title:'殺價魔王大作戰',text,url});return;}}catch(e){if(e&&e.name==='AbortError')return;}
+  try{await navigator.clipboard.writeText(text+' '+url);b.textContent='連結已複製';}catch(e){b.textContent='請複製網址分享';}
+  setTimeout(()=>b.textContent='分享這個遊戲',2000);
+});
+</script>
+</body></html>
