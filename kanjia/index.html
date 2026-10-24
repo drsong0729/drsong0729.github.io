@@ -218,6 +218,48 @@ details.notice summary{cursor:pointer;font-weight:700;color:var(--navy)}
 .res-actions .btn{flex:1 1 140px}
 
 
+/* ---------- 整理小遊戲 ---------- */
+.clean{display:flex;flex-direction:column;gap:6px;flex:0 0 auto}
+.clean-top{display:flex;justify-content:space-between;font-weight:900;color:var(--gold);font-size:14px}
+.clean-top .num{font-size:12px}
+.cbar{height:10px;border:2px solid var(--paper);background:var(--navy-2)}
+.cbar i{display:block;height:100%;background:var(--gold);width:100%}
+.clean-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.cell{aspect-ratio:1.45;min-width:0;border:3px solid var(--ink);font-weight:900;font-size:14px;display:grid;place-items:center;padding:0;line-height:1.1}
+.cell.floor{background:repeating-linear-gradient(45deg,#2a4778 0 6px,#25406d 6px 12px);border-color:#1a3158}
+.cell.it{background:var(--paper);color:var(--ink);box-shadow:0 3px 0 var(--ink);cursor:pointer}
+.cell.it:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.cell.k-mold{background:#cfd6c2;color:#3e5a2f}.cell.k-dust{background:#d8cdb6}.cell.k-trash{background:#e7c9a8}.cell.k-lamp{background:#3b3f55;color:var(--gold)}.cell.k-curt{background:#7a5a9a;color:var(--paper)}
+.cell.half{background:#e8eedb;color:#3e5a2f}
+.cell.done{background:repeating-linear-gradient(45deg,#2a4778 0 6px,#25406d 6px 12px);border-color:var(--mint);box-shadow:none}
+/* ---------- 喊價 ---------- */
+.haggle{display:flex;flex-direction:column;gap:8px;background:var(--navy-2);border:3px solid var(--gold);box-shadow:0 0 0 3px var(--ink);padding:10px 12px;flex:0 0 auto}
+.hg-row{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;font-weight:700;color:var(--mute)}
+.hg-row b{color:var(--paper);font-size:17px}
+.hg-row .pat{color:var(--rose);letter-spacing:.15em}
+.hg-mine{font-size:19px;font-weight:900;color:var(--gold);text-align:center}
+.hg-slide{display:flex;gap:8px;align-items:center}
+.hg-slide input{flex:1;min-width:0;accent-color:var(--gold);height:32px}
+.hg-slide .icon-btn{min-width:42px;font-size:18px}
+.hg-btns{display:flex;gap:8px;flex-wrap:wrap}
+.hg-btns .btn{flex:1 1 130px;font-size:16px;padding:10px 12px}
+/* ---------- 交給 Ryan 對照 ---------- */
+#scr-compare{overflow-y:auto;gap:10px;padding-bottom:16px;margin-right:-6px;padding-right:6px}
+.cmp-head h2{margin:4px 0 0;font-size:24px;font-weight:900;line-height:1.3;text-wrap:balance}
+.cmp-list{display:flex;flex-direction:column;gap:6px}
+.cmp-row{background:var(--navy-2);border-left:4px solid var(--gold);padding:7px 10px;font-size:13.5px;line-height:1.5;animation:slideIn .25s steps(3) both}
+.cmp-row .d{font-weight:900;color:var(--gold);font-size:12.5px}
+.cmp-row .me{color:var(--rose)} .cmp-row .ry{color:var(--mint)}
+.cmp-row b{color:var(--paper);font-weight:900}
+.cmp-sum{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.cmp-table{overflow-x:auto}
+.cmp-table table{width:100%;border-collapse:collapse;font-size:14px}
+.cmp-table th,.cmp-table td{padding:7px 6px;border-bottom:1px dashed rgba(147,166,203,.35);text-align:center;font-variant-numeric:tabular-nums}
+.cmp-table thead th{color:var(--gold);font-size:13px}
+.cmp-table tbody th{text-align:left;font-weight:700;color:var(--paper)}
+.cmp-table td.me{color:var(--rose);font-weight:900}.cmp-table td.ry{color:var(--mint);font-weight:900}
+.dialog .txt{white-space:pre-line}
+
 /* ---------- 333 售屋專案 ---------- */
 #scr-promo{overflow-y:auto;gap:12px;padding-bottom:18px;margin-right:-6px;padding-right:6px}
 .pr-pains{display:flex;flex-direction:column;gap:8px}
@@ -329,10 +371,34 @@ details.notice summary{cursor:pointer;font-weight:700;color:var(--navy)}
         <div class="tbar" id="tbar"><div class="needle" id="needle"></div></div>
         <button class="btn" id="fire-btn" type="button">出招！</button>
       </div>
+      <div class="clean" id="clean" hidden>
+        <div class="clean-top"><span>買方快到了！</span><span class="num" id="clean-sec">20 秒</span></div>
+        <div class="cbar"><i id="clean-bar"></i></div>
+        <div class="clean-grid" id="clean-grid"></div>
+      </div>
+      <div class="haggle" id="haggle" hidden>
+        <div class="hg-row"><span>他的出價</span><b id="hg-offer"></b></div>
+        <div class="hg-row"><span>買方耐心</span><b id="hg-pat" class="pat"></b></div>
+        <div class="hg-mine" id="hg-mine"></div>
+        <div class="hg-slide"><button type="button" class="icon-btn" id="hg-minus" aria-label="少一點">－</button><input type="range" id="hg-range" aria-label="你要喊的價格"><button type="button" class="icon-btn" id="hg-plus" aria-label="多一點">＋</button></div>
+        <div class="hg-btns"><button class="btn" id="hg-ask" type="button">喊這個價</button><button class="btn ghost" id="hg-take" type="button">接受他的出價</button></div>
+      </div>
       <div class="next-row" id="next-row" hidden><button class="btn" id="next-btn" type="button">繼續 ▶</button></div>
     </div>
   </section>
 
+
+  <!-- 交給 Ryan 對照 -->
+  <section id="scr-compare" class="scr" hidden>
+    <div class="cmp-head"><div class="ov-k">FAST FORWARD ▶▶</div><h2>同樣的 21 天，<br>如果交給 Ryan</h2></div>
+    <div class="cmp-list" id="cmp-list"></div>
+    <div class="cmp-sum" id="cmp-sum" hidden>
+      <h3 class="sec-h">兩種 21 天，差在哪裡</h3>
+      <div class="cmp-table"><table><thead><tr><th scope="col"></th><th scope="col">你自己賣</th><th scope="col">交給 Ryan</th></tr></thead><tbody id="cmp-tbody"></tbody></table></div>
+      <p class="disc">對照為遊戲模擬，實際狀況依個案而定。簽約、交屋仍需屋主本人到場。</p>
+    </div>
+    <button class="btn" id="cmp-next" type="button">跳過快轉 ▶▶</button>
+  </section>
 
   <!-- 333 售屋專案 -->
   <section id="scr-promo" class="scr" hidden>
@@ -515,7 +581,7 @@ function fitTitle(cv){if(!cv.width)return;cv.style.width=Math.min(cv.width*(+cv.
 /* ================== 買方題庫（每局隨機抽） ================== */
 // type: view = 看屋挑剔（可能起衝突）；nego = 議價。p = 價格變動（佔開價 %），h = 買方意願變動
 const BUYERS={
- wang:{name:'王先生',title:'比價達人',start:34,pick:3,angry:'你這什麼態度？我是來看房子的耶！',
+ wang:{name:'王先生',title:'比價達人',start:40,pick:3,ceil:95,gap:6,far:'你在開玩笑嗎？差太多了吧。',angry:'你這什麼態度？我是來看房子的耶！',
   intro:'手機裡存滿實價登錄的精算型買方，每一句都在跟別間比。',
   pool:[
    {type:'view',say:'一進門就說：「這玄關好小，鞋櫃也太舊了吧。」',opts:[
@@ -543,7 +609,7 @@ const BUYERS={
      {k:'bad',t:'九折？那你去買別間啦。',h:-30,p:0,fb:'好喔，那就這樣。',tip:'直接趕人很痛快，但也把一個真買方送走了。'},
      {k:'mid',t:'好啦好啦，九折就九折。',h:40,p:-10,fb:'好！（心想：早知道開更低）',tip:'買方嘴裡的「最多」，通常不是真的最多。'}]}
   ]},
- lin:{name:'林媽媽',title:'挑剔阿姨',start:28,pick:4,angry:'哎喲，講話這麼兇，我不想看了啦！',
+ lin:{name:'林媽媽',title:'挑剔阿姨',start:34,pick:4,ceil:93,gap:9,far:'哎喲，這麼貴，我兒子一定不會答應啦！',angry:'哎喲，講話這麼兇，我不想看了啦！',
   intro:'嫌貨才是買貨人。她每個角落都看得很仔細，每個缺點都要你折錢。',
   pool:[
    {type:'view',say:'哎喲，這面牆有壁癌耶，整理起來要花不少錢喔。',opts:[
@@ -575,7 +641,7 @@ const BUYERS={
      {k:'bad',t:'那叫你兒子自己來買。',h:-30,p:0,fb:'你這樣講話就不對了喔！',tip:'對買方的家人不客氣，等於把整個家庭都得罪了。'},
      {k:'good',t:'兩成差太多了。你兒子要不要一起來看？我把附近成交資料整理給他。',h:28,p:0,fb:'也好，讓他自己看看資料。',tip:'真正做決定的人沒來，就想辦法讓他來，不要對著傳話的人讓價。'}]}
   ]},
- boss:{name:'黑董',title:'殺價魔王',start:22,pick:3,angry:'呵，沉不住氣啊。',
+ boss:{name:'黑董',title:'殺價魔王',start:30,pick:4,ceil:91,gap:11,far:'呵，這種價格你自己留著住吧。',angry:'呵，沉不住氣啊。',
   intro:'手上現金滿滿的投資客，專挑累壞、急著賣的屋主下手。最後的大魔王！',
   pool:[
    {type:'nego',say:'我現金買，不用貸款。你開價直接打八折。',opts:[
@@ -642,38 +708,38 @@ const CALLS_VARIANTS=[
 
 /* 突發事件（每局隨機抽 2 個） */
 const ANNOY=[
- {who:{sp:'phone',name:'買方',title:'放鳥'},scene:'night',pre:'約好晚上 7 點看房的買方，你提早下班、打掃完等了一個小時，對方沒來，電話也不接。',q:'你要怎麼處理？',
+ {who:{sp:'phone',name:'買方',title:'放鳥'},ryan:'Ryan 先確認買方時間，就算放鳥也不會浪費你的下班時間。',scene:'night',pre:'約好晚上 7 點看房的買方，你提早下班、打掃完等了一個小時，對方沒來，電話也不接。',q:'你要怎麼處理？',
   fx0:{e:-8,j:-4},
   opts:[
    {k:'mid',t:'再打三通電話。',e:-4,fb:{who:'買方：',t:'喔我忘了，改天再說。'},tip:'自售很常遇到放鳥，每一次都花掉你的下班時間。'},
    {k:'mid',t:'傳訊息約下一次。',e:-2,fb:'已讀不回。',tip:'自售很常遇到放鳥，每一次都花掉你的下班時間。'},
    {k:'mid',t:'把這個號碼封鎖。',heartAll:-3,fb:'一週後他又打來說想看，但你已經接不到了。',tip:'情緒上來就斷聯，有時候會錯過真買方。'}]},
- {who:{sp:'house',name:'同社區',title:'有人降價'},scene:'home',pre:'同社區另一戶開始降價求售，開價比你低 5%。',q:'你的開價要怎麼調整？',
+ {who:{sp:'house',name:'同社區',title:'有人降價'},ryan:'Ryan 用社區行情和物件差異說服買方，不用跟著降價。',scene:'home',pre:'同社區另一戶開始降價求售，開價比你低 5%。',q:'你的開價要怎麼調整？',
   opts:[
    {k:'mid',t:'跟著降 5%，不能輸。',base:-5,fb:'開價降了，詢問電話稍微變多。',tip:'被別人牽著降價，等於讓整個社區一起往下殺。'},
    {k:'good',t:'維持開價，整理一份跟那戶的條件比較表。',e:-8,late:1,heartAll:-3,fb:'你熬夜做好比較表。不過有些買方還是先去看那一戶。',tip:'行情被打亂時，要有資料說明為什麼你的房子值這個價。'},
    {k:'bad',t:'降 10%，一次贏過他。',base:-10,fb:'電話一下子多了起來……但你少了一大筆。',tip:'恐慌性降價，降掉的錢永遠回不來。'}]},
- {who:{sp:'mgr',name:'部門主管',title:'臨時交辦'},scene:'office',pre:'主管臨時要你下週出差三天。可是你這週末已經約了兩組看房。',q:'怎麼辦？',
+ {who:{sp:'mgr',name:'部門主管',title:'臨時交辦'},ryan:'Ryan 照常帶看，你安心出差。',scene:'office',pre:'主管臨時要你下週出差三天。可是你這週末已經約了兩組看房。',q:'怎麼辦？',
   opts:[
    {k:'mid',t:'推掉出差。',j:-18,fb:{who:'主管：',t:'……好，我找別人去。'},tip:'為了賣房推掉工作，主管會記住的。'},
    {k:'mid',t:'去出差，看房延期。',heartAll:-8,fb:'兩組買方都說「那再說吧」。',tip:'買方的熱度不等人，延期常常就沒有下文。'},
    {k:'mid',t:'去出差，請家人代為帶看。',heartAll:-4,e:-4,fb:'家人不熟屋況，被問倒好幾題，還打電話問你。',tip:'不熟房子的人帶看，買方問什麼都答不出來。'}]},
- {who:{sp:'house',name:'颱風夜',title:'窗邊滲水'},scene:'night',pre:'颱風天，你發現主臥窗邊在滲水。明天就有人要來看房。',q:'你要怎麼處理？',
+ {who:{sp:'house',name:'颱風夜',title:'窗邊滲水'},ryan:'Ryan 安排師傅處理並記錄屋況，再誠實告知買方。',scene:'night',pre:'颱風天，你發現主臥窗邊在滲水。明天就有人要來看房。',q:'你要怎麼處理？',
   opts:[
    {k:'good',t:'連夜找師傅臨時處理，之後再做好防水。',e:-14,late:1,loss:1.5,lossLabel:'窗邊防水修繕',fb:'師傅半夜才來，弄到兩點。',tip:'屋況問題要處理，也要記錄下來，之後才能說清楚。'},
    {k:'bad',trap:1,t:'先擦乾，看房時不要提。',set:'windowLeak',fb:'看房很順利，沒人發現。',tip:'知道的瑕疵不說，交屋後可能被要求賠償。'},
    {k:'mid',t:'直接跟買方說，價格可以再談。',base:-2,fb:'買方說：「那我要再考慮一下。」',tip:'誠實是對的，但沒處理的問題會直接變成殺價籌碼。'}]},
- {who:{sp:'phone',name:'家人',title:'晚餐時間'},scene:'night',pre:'家人一直問：「怎麼還沒賣掉？要不要降價？」晚餐吃到一半就吵起來。',q:'你怎麼回應？',
+ {who:{sp:'phone',name:'家人',title:'晚餐時間'},ryan:'Ryan 定期回報帶看和出價，家人也看得到進度。',scene:'night',pre:'家人一直問：「怎麼還沒賣掉？要不要降價？」晚餐吃到一半就吵起來。',q:'你怎麼回應？',
   opts:[
    {k:'mid',t:'好啦，降 3% 總可以了吧。',base:-3,fb:'家人安靜了，你卻心情很差。',tip:'被家裡的壓力逼著降價，常常降得不甘願又沒效。'},
    {k:'bad',t:'你們又不懂，不要管我！',fight:1,e:-8,fb:'整個晚上沒人跟你說話。',tip:'賣房的壓力，常常會轉到家人身上。'},
    {k:'mid',t:'什麼都不說，自己默默扛下來。',e:-12,fb:'你躺在床上，一直想到半夜。',tip:'賣房是長期戰，壓力沒有出口，體力會先垮。'}]},
- {who:{sp:'mgr',name:'部門主管',title:'考核面談'},scene:'office',pre:'主管在面談時提到：「你最近上班常看手機，請假也變多了。」',q:'你怎麼回答？',
+ {who:{sp:'mgr',name:'部門主管',title:'考核面談'},ryan:'帶看和回訊息都交給 Ryan，上班不用一直看手機。',scene:'office',pre:'主管在面談時提到：「你最近上班常看手機，請假也變多了。」',q:'你怎麼回答？',
   opts:[
    {k:'mid',t:'老實說在賣房子，請主管體諒。',j:-6,fb:{who:'主管：',t:'私事要處理好，不要影響工作。'},tip:'工作和賣房搶時間，主管不會一直體諒。'},
    {k:'mid',t:'保證會改善，房子的事晚上再處理。',e:-12,late:1,fb:'你開始每天晚上回訊息到半夜。',tip:'把賣房全塞到晚上，就是拿睡眠去換。'},
    {k:'bad',t:'沒說什麼，點頭帶過。',j:-12,fb:'主管在考核表上寫了「專注度不足」。',tip:'不溝通，主管只看得到你的分心。'}]},
- {who:{sp:'phone',name:'假買方',title:'其實是仲介'},scene:'home',pre:'一位「買方」來看房，問了很多問題：最低多少？急不急？還有誰在看？',q:'他問你最低可以多少，你怎麼回？',
+ {who:{sp:'phone',name:'假買方',title:'其實是仲介'},ryan:'Ryan 一眼就看穿同業探底，底價不會外流。',scene:'home',pre:'一位「買方」來看房，問了很多問題：最低多少？急不急？還有誰在看？',q:'他問你最低可以多少，你怎麼回？',
   opts:[
    {k:'bad',trap:1,t:'老實跟他說九折可以。',set:'floor',fb:'他笑著說：「了解。」後來你才發現他是附近的仲介，想來探你的底。',tip:'底價一說出口，就可能傳遍整個商圈。'},
    {k:'good',t:'價格要看完、有誠意出價再談。',e:-4,fb:'他看完就走了，再也沒聯絡。後來你才知道他是同業。',tip:'自售時很難分辨誰是真買方，白花時間是常態。'},
@@ -737,13 +803,15 @@ const LAW=[
 ];
 
 /* ================== 21 天劇本 ================== */
+const RYAN_DEF={view:'Ryan 代為帶看、應付挑剔和喊價，你只要最後確認價格。',law:'稅務法規由 Ryan 和合作代書事先確認，不用你自己查。',calc:'Ryan 協助試算稅費，提醒你可以申請的優惠。',screen:'Ryan 先過濾來電，同業、看熱鬧和詐騙不會打擾你。',narr:'Ryan 事先把關，這件事不會發生。',choice:'交給 Ryan 處理，你照常上班。'};
 const weekday=d=>{while(['六','日'].includes(DOW[(d-1)%7]))d++;return d;};
 const STEPS=[
- {id:'ad',day:1,scene:'night',who:{sp:'doc',name:'自己刊登',title:'591 廣告'},
+ {id:'ad',ryan:'Ryan 依權狀和現況寫廣告，坪數、格局都寫清楚。',day:1,scene:'night',who:{sp:'doc',name:'自己刊登',title:'591 廣告'},
   pre:[{t:'週末一早，你開始自己拍照、量坪數、寫廣告文案，一路弄到半夜一點。',fx:{e:-10,late:1}}],
   variant:()=>AD_VARIANTS[G.v.ad]},
- {id:'calls',day:2,scene:'home',who:{sp:'phone',name:'手機',title:'響個不停'},variant:()=>{const v=CALLS_VARIANTS[G.v.calls];return {pre:[{t:v.pre}],q:v.q,opts:v.opts};}},
- {id:'wangcall',day:3,scene:'office',who:{sp:'mgr',name:'部門主管',title:'週一例會'},
+ {id:'calls',ryan:'Ryan 的團隊接電話、過濾同業和詐騙，你照常上班。',day:2,scene:'home',who:{sp:'phone',name:'手機',title:'響個不停'},variant:()=>{const v=CALLS_VARIANTS[G.v.calls];return {pre:[{t:v.pre}],q:v.q,opts:v.opts};}},
+ {id:'screen1',day:2,kind:'screen'},
+ {id:'wangcall',ryan:'Ryan 代為帶看，你不用請假。',day:3,scene:'office',who:{sp:'mgr',name:'部門主管',title:'週一例會'},
   pre:[{t:'週一早上 10 點，你在開部門會議，手機一直震。是看到廣告的王先生，想約週三下午 3 點看房。'}],
   q:'會議還在進行，怎麼辦？',
   opts:[
@@ -752,19 +820,20 @@ const STEPS=[
    {k:'bad',t:'會議中偷偷回訊息。',j:-12,fb:{who:'主管：',t:'你剛剛說的數字是多少？……你有在聽嗎？'},tip:'一邊上班一邊接買方，兩邊都顧不好。'}]},
  {id:'law1',day:4,kind:'law',phase:'pre'},
  {id:'vwang',day:5,kind:'view',buyer:'wang'},
- {id:'deposit',day:5,when:()=>G.flags.wangDeal,scene:'home',who:{sp:'wang',name:'王先生',title:'想下訂'},
+ {id:'deposit',ryan:'Ryan 用斡旋金或要約書，搭配代書和履約保證，訂金規則一開始就寫清楚。',day:5,when:()=>G.flags.wangDeal,scene:'home',who:{sp:'wang',name:'王先生',title:'想下訂'},
   pre:[{who:'王先生：',t:'我很喜歡這間！我先付 10 萬訂金，你寫張收據給我就好。'}],
   q:'這筆訂金要怎麼收？',
   opts:[
    {k:'bad',trap:1,t:'好，手寫一張收據，先把錢收下來。',set:'handReceipt',fb:'你收下 10 萬，心裡踏實多了。'},
    {k:'good',t:'先約代書擬好條款，也問清楚他的自備款和貸款。',j:-12,e:-6,leave:.5,set:'depositOk',fb:'你又請了半天假，跑了一趟代書事務所。',tip:'收訂金前把條款和買方資金確認好，最能保護自己。'},
    {k:'mid',trap:1,t:'不用收訂金，口頭說好就好。',set:'verbal',fb:{who:'王先生：',t:'好啊，那我下週來簽約！'}}]},
+ {id:'screen2',day:6,kind:'screen'},
  {id:'idconseq',day:6,when:()=>G.flags.idLeak||G.flags.idLeakLite,kind:'narr',scene:'night',who:{sp:'phone',name:'陌生來電',title:'出事了'},
   lines:()=>[{t:G.flags.idLeak?'有人拿你的身分證和權狀照片，在網路上冒充屋主刊登「急售」，還跟好幾個人收了訂金。':'有人拿你的權狀照片，冒名在網路上刊登你家「急售」。'},
    {who:'陌生人（電話）：',t:'你是屋主嗎？我已經匯訂金了，什麼時候可以看房？'},
    {t:'你只好去報案、跟平台申訴，一個一個解釋。',fx:G.flags.idLeak?{e:-16,j:-10,leave:1}:{e:-10,j:-6}}],
   tip:'身分證和權狀影本不要給沒見過面的人。核對身分是簽約時由代書當面做的事。'},
- {id:'wangback',day:7,when:()=>G.flags.wangDeal,kind:'narr',scene:'office',who:{sp:'phone',name:'王先生',title:'來電'},
+ {id:'wangback',ryan:'Ryan 依合約處理違約，你不用跑調解。',day:7,when:()=>G.flags.wangDeal,kind:'narr',scene:'office',who:{sp:'phone',name:'王先生',title:'來電'},
   lines:()=>{const L=[{who:'王先生（電話）：',t:'不好意思，我家人反對，房子我不買了。'}];
    if(G.flags.handReceipt)L.push({t:'收據上沒寫違約怎麼處理。他要你把 10 萬全部退回，你不肯，他說要申請調解。你為了調解又請了一天假。',fx:{e:-14,j:-14,leave:1,fight:1}});
    else if(G.flags.verbal)L.push({t:'口頭約定沒有保障。你為了等他簽約，推掉了另外兩組看屋，等於白忙一週。',fx:{e:-8,heartAll:-4}});
@@ -773,14 +842,14 @@ const STEPS=[
   tip:()=>G.flags.depositOk?'事前多花的時間，換來事後不用吵架。':'訂金收據要寫清楚違約條款。透過房仲成交，會先用斡旋金或要約書，再加上代書和履約保證，規則一開始就講清楚。'},
  {id:'rand1',day:8,kind:'rand'},
  {id:'law2',day:9,kind:'law',phase:'pre'},
- {id:'overtime',day:10,scene:'office',who:{sp:'mgr',name:'部門主管',title:'專案結案'},
+ {id:'overtime',ryan:'Ryan 代為帶看，你安心加班。',day:10,scene:'office',who:{sp:'mgr',name:'部門主管',title:'專案結案'},
   pre:[{t:'專案結案前，主管要大家留下來加班。這時 LINE 跳出三則看屋詢問，其中一位說今晚就想看。'}],
   q:'今晚怎麼安排？',
   opts:[
    {k:'mid',t:'留下來加班，房子的事回家再說。',j:4,e:-10,heartAll:-3,fb:'回到家已經 11 點，那位買方已讀不回了。',tip:'錯過買方的第一時間，熱度很快就冷掉。'},
    {k:'mid',t:'準時下班，趕回家帶看。',j:-14,e:-12,fb:'對方看了 10 分鐘就說「再考慮」。主管在群組裡標記你。',tip:'為了一組不確定的買方犧牲工作，常常兩頭落空。'},
    {k:'mid',t:'加班到 9 點，再約對方 10 點看。',e:-20,late:1,fb:'看完房快 11 點，你累到直接在沙發上睡著。',tip:'把帶看塞進下班後，體力會被一天一天榨乾。'}]},
- {id:'key',day:11,scene:'office',who:{sp:'lin',name:'林媽媽',title:'來電'},
+ {id:'key',ryan:'Ryan 全程陪同帶看，鑰匙不交給陌生人。',day:11,scene:'office',who:{sp:'lin',name:'林媽媽',title:'來電'},
   pre:[{who:'林媽媽（電話）：',t:'我想白天帶兒子去看。你上班不方便的話，鑰匙放管理室，我們自己進去看就好啦。'}],
   q:'要怎麼回林媽媽？',
   opts:[
@@ -791,7 +860,7 @@ const STEPS=[
   lines:[{t:'晚上回家，你發現他們帶了裝潢師傅進來量尺寸。地上都是鞋印，浴室門把也被弄鬆了。',fx:{e:-8,loss:0.5,lossLabel:'門把維修、清潔'}},{who:'林媽媽（LINE）：',t:'房子我們看過了，明天再約你當面談喔！'}],
   tip:'把鑰匙交給不熟的人自行看屋，屋況和安全都沒人顧。房仲帶看會全程陪同，並登記看屋的人。'},
  {id:'vlin',day:()=>G.linDay+(G.flags.lentKey?1:0),kind:'view',buyer:'lin'},
- {id:'loan',day:()=>G.day,when:()=>G.flags.linDeal,scene:'home',who:{sp:'lin',name:'林媽媽',title:'想買'},
+ {id:'loan',ryan:'Ryan 先確認買方貸款和自備款，合約寫明貸款不足怎麼處理。',day:()=>G.day,when:()=>G.flags.linDeal,scene:'home',who:{sp:'lin',name:'林媽媽',title:'想買'},
   pre:[{who:'林媽媽：',t:'這間我要了！不過我要跟銀行貸八成喔，應該沒問題啦。'}],
   q:'簽約前，貸款的事要怎麼處理？',
   opts:[
@@ -804,8 +873,9 @@ const STEPS=[
   tip:'簽約前要先確認買方貸款，並約定貸款不足時怎麼處理。房仲成交時會先幫你把關買方的資金。',
   post:()=>{G.flags.linDeal=false;}},
  {id:'rand2',day:()=>Math.max(12,G.day),kind:'rand'},
+ {id:'screen3',day:()=>Math.max(13,G.day),kind:'screen'},
  {id:'law3',day:()=>Math.max(13,G.day),kind:'law',phase:'pre'},
- {id:'tired',day:()=>weekday(Math.max(14,G.day)),scene:'office',who:{sp:'mgr',name:'部門主管',title:'皺眉中'},
+ {id:'tired',ryan:'帶看和回訊息都交給 Ryan，你晚上可以好好休息。',day:()=>weekday(Math.max(14,G.day)),scene:'office',who:{sp:'mgr',name:'部門主管',title:'皺眉中'},
   pre:[{t:'連續兩週，下班就趕回家整理房子、回訊息、帶看。今天開會時你打了一個大哈欠，剛好被主管看到。',fx:{j:-6}}],
   q:'今晚你打算……',
   opts:[
@@ -814,7 +884,7 @@ const STEPS=[
    {k:'bad',t:'熬夜把所有買方訊息回完。',e:-16,late:1,fb:'回到凌晨兩點，隔天上班眼睛都睜不開。',tip:'賣房常常要拖一、兩個月，屋主的體力和本業都是隱形成本。'}]},
  {id:'vboss',day:16,when:()=>!G.sold,kind:'view',buyer:'boss'},
  // ---- 成交後：簽約與交屋 ----
- {id:'fees',day:()=>weekday(Math.max(17,G.day)),when:()=>!!G.sold,scene:'office',who:{sp:'doc',name:'買賣契約',title:'簽約前一天'},
+ {id:'fees',ryan:'Ryan 和代書在簽約前就列好費用分擔表。',day:()=>weekday(Math.max(17,G.day)),when:()=>!!G.sold,scene:'office',who:{sp:'doc',name:'買賣契約',title:'簽約前一天'},
   pre:[{who:'買方：',t:'代書費、規費，還有這期的房屋稅和地價稅，各自誰付？'}],
   q:'你要怎麼回答？',
   opts:[
@@ -826,14 +896,14 @@ const STEPS=[
   tip:'費用分擔沒先講清楚，簽約當天最容易吵起來。'},
  {id:'calc',day:()=>Math.max(18,G.day),when:()=>!!G.sold,kind:'calc'},
  {id:'law4',day:()=>weekday(Math.max(19,G.day)),when:()=>!!G.sold,kind:'law',phase:'post'},
- {id:'disclose',day:()=>weekday(Math.max(19,G.day)),when:()=>!!G.sold,scene:'office',who:{sp:'doc',name:'現況說明書',title:'代書請你填'},
+ {id:'disclose',ryan:'Ryan 協助整理屋況和修繕紀錄，現況說明書照實填。',day:()=>weekday(Math.max(19,G.day)),when:()=>!!G.sold,scene:'office',who:{sp:'doc',name:'現況說明書',title:'代書請你填'},
   pre:[{t:'代書請你填「不動產現況說明書」。三年前浴室漏過水，後來有修好。'}],
   q:'這件事要寫進去嗎？',
   opts:[
    {k:'bad',trap:1,t:'已經修好了，不用寫吧。',set:'hideLeak',fb:'你在「是否曾經漏水」那一欄勾了「否」。'},
    {k:'good',t:'照實寫，附上當時的修繕紀錄。',e:-4,fb:'買方看了紀錄，反而覺得你很誠實。',tip:'知道的瑕疵要告知，有修繕紀錄更好，交屋後才不會被追究。'}]},
  {id:'law5',day:()=>Math.max(20,G.day),when:()=>!!G.sold,kind:'law',phase:'post'},
- {id:'handover',day:21,when:()=>!!G.sold,scene:'home',who:{sp:'house',name:'交屋',title:'最後一天'},
+ {id:'handover',ryan:'Ryan 事先列好點交清單，哪些家電要留寫得清清楚楚。',day:21,when:()=>!!G.sold,scene:'home',who:{sp:'house',name:'交屋',title:'最後一天'},
   pre:[{t:'交屋前一天，你準備把客廳的冷氣拆下來帶去新家。不過看房時，你好像隨口說過「冷氣可以留下來」。'}],
   q:'冷氣要怎麼處理？',
   opts:[
@@ -893,7 +963,7 @@ function newGame(){
   G={ask:G.ask||1200,type:G.type||'大樓',day:1,E:100,J:100,kit:HARD.kit,flags:{},heartMod:{},heartAll:0,base:100,offers:{},sold:null,linDay:11,si:0,
     v:{ad:ri(AD_VARIANTS.length),calls:ri(CALLS_VARIANTS.length)},
     lawPre:pre,lawPost:post.concat(pre.slice(3)),annoy:shuffle(ANNOY),
-    stats:{leave:0,late:0,views:0,fights:0,traps:0,quiz:0,quizOk:0},picks:[],losses:[],busy:false,end:null};
+    stats:{leave:0,late:0,views:0,fights:0,traps:0,quiz:0,quizOk:0,screen:0,screenOk:0},picks:[],losses:[],log:[],cs:null,busy:false,end:null};
 }
 newGame();
 function show(id){document.querySelectorAll('.scr').forEach(s=>s.hidden=(s.id!==id));}
@@ -961,7 +1031,7 @@ function fxParts(fx){const a=[];if(!fx)return a;
   if(fx.base)a.push(`開價 ${fx.base}%`);if(fx.fight)a.push('起衝突');
   if(fx.heartAll||fx.heart)a.push('買方熱度下降');
   return a;}
-function hidePanels(){$('#choices').hidden=true;$('#timing').hidden=true;$('#next-row').hidden=true;$('#tip').hidden=true;renderKit();}
+function hidePanels(){$('#clean').hidden=true;$('#haggle').hidden=true;$('#choices').hidden=true;$('#timing').hidden=true;$('#next-row').hidden=true;$('#tip').hidden=true;renderKit();}
 function showTip(rows){const t=$('#tip');t.innerHTML='';rows=rows.filter(r=>r&&r[1]);if(!rows.length){t.hidden=true;return;}
   rows.forEach(([tag,text,cls])=>{const p=document.createElement('div');p.className=cls||'';const b=document.createElement('b');b.textContent=tag;p.append(b,' '+text);t.appendChild(p);});t.hidden=false;}
 function fxRow(parts){return ['影響：',parts.length?parts.join('｜'):'暫時看不出有什麼影響……','fx'];}
@@ -1002,15 +1072,26 @@ function run(){
   hidePanels();
   if(d>G.day){const n=d-G.day;G.day=d;dayCard(n,()=>exec(s));}else exec(s);
 }
-function nextStep(){G.si++;run();}
+function snap(){return {E:G.E,J:G.J,leave:G.stats.leave,late:G.stats.late,loss:G.losses.reduce((a,l)=>a+l.amt,0),fights:G.stats.fights};}
+function nextStep(){
+  if(G.cs){const a=G.cs.before,b=snap();const p=[];
+    if(b.E!==a.E)p.push(`體力 ${b.E>a.E?'+':''}${b.E-a.E}`);if(b.J!==a.J)p.push(`工作 ${b.J>a.J?'+':''}${b.J-a.J}`);
+    if(b.leave>a.leave)p.push(`請假 ${+(b.leave-a.leave).toFixed(1)} 天`);if(b.late>a.late)p.push('熬夜');
+    if(b.loss>a.loss)p.push(`損失 ${fmtW(b.loss-a.loss)} 萬`);if(b.fights>a.fights)p.push('起衝突');
+    if(G.cs.extra)p.push(G.cs.extra);
+    G.log.push({day:G.cs.day,title:G.cs.title||'事件',me:p.length?p.join('｜'):'沒什麼影響',ryan:G.cs.ryan||RYAN_DEF.choice});G.cs=null;}
+  G.si++;run();}
 function exec(s0){
   updateHud();
+  G.cs={day:G.day,before:snap(),title:'',ryan:'',extra:''};
   if(s0.kind==='view')return startView(s0.buyer);
   if(s0.kind==='law')return runLaw(s0);
-  if(s0.kind==='calc')return runCalc();
+  if(s0.kind==='calc'){G.cs.title='稅務試算';G.cs.ryan=RYAN_DEF.calc;return runCalc();}
+  if(s0.kind==='screen')return runScreen();
   let s=s0;
   if(s0.kind==='rand'){const a=G.annoy.shift();s={...a,pre:[{t:a.pre,fx:a.fx0}]};}
   else if(s0.variant)s={...s0,...s0.variant(),pre:[...(s0.pre||[]),...((s0.variant().pre)||[])]};
+  G.cs.title=s.who?(s.who.title||s.who.name):s.id;G.cs.ryan=s.ryan||(s.kind==='narr'?RYAN_DEF.narr:RYAN_DEF.choice);
   Snd.play('day');
   setScene(s.scene,s.who,false);G.heart=null;G.pct=null;updateBars();
   setHudTitle(s.who?s.who.title:'');
@@ -1039,7 +1120,7 @@ function exec(s0){
 function runLaw(s){
   const pool=s.phase==='post'?G.lawPost:G.lawPre;const Q=pool.shift();
   if(!Q)return nextStep();
-  G.stats.quiz++;Snd.play('quiz');
+  G.stats.quiz++;Snd.play('quiz');G.cs.title='法規題・'+Q.who.title;G.cs.ryan=RYAN_DEF.law;
   setScene(Q.who.sp==='calc'||Q.who.sp==='doc'?'office':'home',Q.who,false);G.heart=null;G.pct=null;updateBars();
   setHudTitle(Q.who.title);
   sayLines([{who:Q.who.name+'：',t:Q.q}],()=>showChoices(Q.opts,o=>{
@@ -1085,22 +1166,84 @@ function runCalc(){
   }));
 }
 
+/* ================== 來電判讀 ================== */
+const CALLERS={
+ real:{label:'真買方',clues:['先問屋齡、管理費和有沒有車位','說小孩明年上國中，想找這附近的學區','主動說已經問過銀行，貸款八成沒問題','約週末要帶另一半一起來看','問最近有沒有漏水、管線換過沒'],amb:['問價格還有沒有空間','問你為什麼要賣']},
+ agent:{label:'同業探底',clues:['一開口就問最低可以多少','問你有沒有給別家仲介賣','說「我客戶很多」，卻講不出客戶要什麼','只說自己姓陳，不肯留全名','一直問你急不急著賣'],amb:['問屋齡和管理費','問什麼時候方便看房']},
+ browser:{label:'看熱鬧',clues:['說自己只是順便問問','預算比你的開價低三成','一直問社區鄰居的八卦','說房子要等明年才會買','說剛好路過看到廣告'],amb:['問有沒有車位','說週末可能會來看看']},
+ scam:{label:'詐騙',clues:['要你先把身分證和權狀拍照傳給他','說要先幫你做鑑價，請你付 6,000 元鑑價費','急著要你今天就決定','要你加一個陌生的 LINE 帳號私下談','出價比你的開價還高'],amb:['說自己是很有誠意的買方','問房子還在不在']}
+};
+const CALLER_NAMES=['陳先生','林小姐','張先生','黃太太','李先生','吳小姐','劉先生','蔡小姐','楊先生','許太太'];
+function genCaller(){
+  const r=Math.random();const type=r<.3?'real':r<.55?'agent':r<.8?'browser':'scam';const C=CALLERS[type];
+  const clues=shuffle([...shuffle(C.clues).slice(0,2),C.amb[ri(C.amb.length)]]);
+  return {type,clues,name:CALLER_NAMES[ri(CALLER_NAMES.length)]};
+}
+function runScreen(){
+  const c=genCaller();G.stats.screen++;Snd.play('quiz');Snd.sfx('ring');
+  G.cs.title='來電判讀';G.cs.ryan=RYAN_DEF.screen;
+  setScene('home',{sp:'phone',name:c.name,title:'來電判讀'},false);G.heart=null;G.pct=null;updateBars();setHudTitle('來電判讀');
+  const opts=[{t:'真買方，好好接待',type:'real'},{t:'同業來探底價',type:'agent'},{t:'只是看熱鬧',type:'browser'},{t:'詐騙，小心',type:'scam'}].map(o=>({...o,ok:o.type===c.type?1:0}));
+  sayLines([{t:`手機響了，是一位${c.name}。通話中你注意到幾件事，判斷看看對方是誰。`},{who:'線索（對方是誰？）：',t:c.clues.map(x=>'・'+x).join('\n')}],()=>showChoices(opts,o=>{
+    const real=CALLERS[c.type].label;let fx,msg;
+    if(o.ok){G.stats.screenOk++;Snd.sfx('right');banner('看穿了！');
+      if(c.type==='real'){fx={e:-4,heartAll:4};msg='你認真接待，對方對你印象很好，之後的買方也聽說你很好溝通。';}
+      else{fx={e:2};msg=c.type==='scam'?'你沒有上當，也沒給出任何資料。':'你客氣結束通話，省下一次白跑的帶看。';}}
+    else{G.stats.traps++;Snd.sfx('wrong');banner('看走眼了…',true);
+      if(c.type==='real'){fx={heartAll:-5};msg='對方其實是真買方，被你冷淡回絕，轉頭去看別間了。';}
+      else if(c.type==='scam'){fx={e:-6,loss:0.6,lossLabel:'被騙走的「鑑價費」'};msg='你照對方說的做，後來才發現是詐騙，對方已經聯絡不到。';}
+      else{fx={e:-10,j:-4};msg=c.type==='agent'?'你特地請假帶看，結果他是附近的同業，只是來探你的底價。':'你特地趕回家帶看，對方看了五分鐘就走了。';}
+      G.picks.push({k:'law',tip:'自售時最難的是分辨來電：同業會一直問底價，看熱鬧的預算差很多，詐騙會要證件、要你付錢或催你當天決定。'});}
+    applyFx(fx);
+    say('',msg,()=>{showTip([fxRow(fxParts(fx)),['對方其實是：',real]]);nextBtn('繼續 ▶',nextStep);});
+  }));
+}
+
+/* ================== 帶看前整理（20 秒小遊戲） ================== */
+const CLEAN_ITEMS=[{k:'box',t:'雜物',n:1},{k:'cloth',t:'衣服',n:1},{k:'dish',t:'碗盤',n:1},{k:'shoe',t:'拖鞋',n:1},{k:'dust',t:'灰塵',n:1},
+  {k:'mold',t:'壁癌',n:2},{k:'curt',t:'窗簾',n:1},{k:'lamp',t:'開燈',n:1},{k:'trash',t:'垃圾',n:1},{k:'mold',t:'壁癌',n:2},{k:'box',t:'紙箱',n:1},{k:'cloth',t:'棉被',n:1}];
+let cleanT=null;
+function runClean(done){
+  hidePanels();
+  const count=8+ri(3);const items=shuffle(CLEAN_ITEMS).slice(0,count);const pos=shuffle([...Array(20).keys()]).slice(0,count);
+  const grid=$('#clean-grid');grid.innerHTML='';let cleared=0,taps=0,over=false;
+  const cells=[];for(let i=0;i<20;i++){const it=items[pos.indexOf(i)];
+    if(it){const b=document.createElement('button');b.type='button';b.className='cell it k-'+it.k;b.textContent=it.t;let left=it.n;
+      b.addEventListener('click',()=>{if(over||left<=0)return;taps++;left--;Snd.sfx('sel');
+        if(left>0){b.classList.add('half');b.textContent='再擦';return;}
+        b.classList.add('done');b.textContent='';b.disabled=true;cleared++;Snd.sfx('hit');if(cleared>=count)end();});
+      cells.push(b);grid.appendChild(b);}
+    else{const d=document.createElement('div');d.className='cell floor';grid.appendChild(d);}}
+  $('#clean').hidden=false;say('','買方 20 秒後到！點掉所有雜物，壁癌要擦兩下。');
+  const T=20000,t0=performance.now();const bar=$('#clean-bar');bar.style.width='100%';
+  clearInterval(cleanT);cleanT=setInterval(()=>{const left=Math.max(0,T-(performance.now()-t0));bar.style.width=(left/T*100)+'%';$('#clean-sec').textContent=Math.ceil(left/1000)+' 秒';if(left<=0)end();},100);
+  function end(){if(over)return;over=true;clearInterval(cleanT);
+    const ratio=cleared/count;const bonus=ratio>=1?14:Math.round(ratio*12)-3;const cost=-(3+Math.round(taps*0.6));
+    setTimeout(()=>{$('#clean').hidden=true;
+      applyFx({e:cost});G.heart=clamp(G.heart+bonus,5,95);updateBars();floatTxt(bonus>=0?'up':'down',`第一印象 ${bonus>=0?'+':''}${bonus}`,'56%','8%');
+      if(bonus<0)Snd.sfx('bad');
+      say('',ratio>=1?'家裡乾乾淨淨，買方一進門就有好感。':ratio>=.6?'還算整齊，但角落的雜物還是被看到了。':'來不及整理，家裡亂成一團，買方皺起眉頭。',()=>{
+        showTip([fxRow([`體力 ${cost}`,`第一印象 ${bonus>=0?'+':''}${bonus}`]),['整理：',`完成 ${cleared}/${count} 項。賣房期間家裡要隨時保持能看的狀態，每次帶看前都得整理一遍。`]]);
+        nextBtn('開門 ▶',done);});
+    },350);}
+}
+
 /* ================== 帶看（戰鬥） ================== */
 function startView(id){
   const B=BUYERS[id];G.cur=id;G.heart=clamp(B.start+(G.heartMod[id]||0)+G.heartAll,5,95);G.pct=G.base;G.round=0;G.stats.views++;
-  G.rounds=shuffle(B.pool).slice(0,B.pick);if(B.final)G.rounds.push(B.final);
+  G.cs.title='帶看 '+B.name;G.cs.ryan=RYAN_DEF.view;
+  G.rounds=shuffle(B.pool).slice(0,B.pick);
   if(id==='wang'&&G.flags.adFake)G.rounds.splice(1,0,AD_VARIANTS[G.v.ad].round);
   setScene('home',{sp:id,name:B.name,title:B.title},true);setHudTitle('帶看 '+B.name);updateBars();
   Snd.play(id==='boss'?'boss':'battle');
   overlay(`<div class="ov-k">${id==='boss'?'BOSS':'帶看'}</div><canvas id="ov-cv" class="px slide-in"></canvas>
-    <div class="ov-h">${B.title} ${B.name}<br>來看房了！</div><p class="ov-p">${B.intro}</p><p class="ov-p" style="color:var(--mute);font-size:13px">意願要衝到 ${HARD.dealAt} 以上才會成交。被挑剔時回話太衝會起衝突，你越累越容易失控。</p>`,'開門迎接',()=>{
-    applyFx({e:HARD.viewCost});floatTxt('gold','打掃家裡','6%','30%');
+    <div class="ov-h">${B.title} ${B.name}<br>要來看房了！</div><p class="ov-p">${B.intro}</p><p class="ov-p" style="color:var(--mute);font-size:13px">先整理家裡，再應付挑剔，最後喊價。被挑剔時回話太衝會起衝突，你越累越容易失控。</p>`,'開始整理',()=>runClean(()=>{
     if(id==='boss'&&G.flags.floor){
       sayLines([{who:'黑董：',t:'我聽說你講過九折可以談。那我們就從那裡開始吧。'}],()=>{G.pct-=5;floatTxt('down',`-${fmt(G.ask*.05)}萬`,'6%','30%');updateBars();
         showTip([['影響：','價格 -5%'],['提醒：','你說出去的底價，已經傳到別的買方耳裡了。']]);G.picks.push({k:'conseq',tip:'底價一說出口就收不回來，消息還可能傳到其他買方耳裡。'});
         nextBtn('開始談 ▶',viewRound);});
     }else viewRound();
-  });
+  }));
   drawSprite($('#ov-cv'),SPR[id]);
 }
 function viewRound(){
@@ -1140,7 +1283,7 @@ function resolveView(o,R,m,zone){
   else{Snd.sfx('bad');shakeEl($('#arena'));floatTxt('down','意願 '+h,'56%','8%');}
   if(p<0)setTimeout(()=>{Snd.sfx('drop');floatTxt('down',`-${fmt(-p*G.ask/100)}萬`,'6%','40%');},300);
   updateBars();
-  const parts=[`意願 ${h>0?'+':''}${h}`];if(p<0)parts.push(`價格 -${fmt(-p*G.ask/100)} 萬`);if(conflict)parts.push('體力 -8','起衝突');
+  const parts=[`意願 ${h>0?'+':''}${h}`];if(p<0)parts.push(`你的底線 -${fmt(-p*G.ask/100)} 萬`);if(conflict)parts.push('體力 -8','起衝突');
   setTimeout(()=>{
     const lines=conflict?[{who:'你：',t:o.k==='good'?'（你太累了，語氣不小心衝了一點……）':'（你忍不住提高了音量）',fx:{e:-8,fight:1}},{who:B.name+'：',t:B.angry}]:[{who:B.name+'：',t:o.fb}];
     sayLines(lines,()=>{
@@ -1148,15 +1291,68 @@ function resolveView(o,R,m,zone){
       showTip([fxRow(parts),[tag,conflict?(G.E<50?'你已經很累了，被挑剔時特別容易失控。賣房拖越久，屋主的情緒越難顧。':o.tip):o.tip]]);
       if(conflict)G.picks.push({k:'conseq',tip:'帶看時被挑剔很正常。屋主越累越容易跟買方吵起來，一吵，買方就走了。'});
       G.round++;
-      const end=G.heart>=100||G.heart<=0||G.round>=G.rounds.length;
-      nextBtn(end?'看結果 ▶':'下一回合 ▶',end?endView:viewRound);
+      if(G.heart<=0){G.leaveWhy='scared';return nextBtn('看結果 ▶',()=>endView(false));}
+      const end=G.heart>=100||G.round>=G.rounds.length;
+      nextBtn(end?'開始喊價 ▶':'下一回合 ▶',end?startHaggle:viewRound);
     });
   },600);
 }
-function endView(){
-  const B=BUYERS[G.cur],id=G.cur;hidePanels();
-  const deal=G.heart>=HARD.dealAt;const price=G.ask*G.pct/100;
-  if(G.E<=0||G.J<=0){return run();}
+
+/* ---------- 喊價：買方心裡有一個看不到的最高價 ---------- */
+let HG=null;
+function wan(pct){return Math.round(G.ask*pct/100);}
+function startHaggle(){
+  const B=BUYERS[G.cur];hidePanels();
+  if(G.heart<40){G.leaveWhy='cold';return endView(false);}
+  const maxPct=clamp(B.ceil+(G.heart-65)*0.15+(Math.random()*3-1.5),70,G.pct);
+  const max=wan(maxPct);const cap=wan(G.pct);
+  let offer=Math.min(max,wan(maxPct-B.gap-Math.random()*2));
+  HG={max,cap,offer,pat:3,last:cap,step:Math.max(1,Math.round(G.ask*0.005))};
+  setHudTitle(`帶看 ${B.name}・喊價`);
+  if(offer>=cap){
+    return say(B.name+'：',`你的價格 ${fmt(cap)} 萬，我直接接受！`,()=>{
+      showTip([['提醒：','對方一口就答應，代表你的價格可能已經讓太多了。']]);G.pct=+(cap/G.ask*100).toFixed(1);nextBtn('成交 ▶',()=>endView(true));});
+  }
+  say(B.name+'：',`我出 ${fmt(offer)} 萬，你考慮看看。`,openHaggleUI);
+}
+function openHaggleUI(){
+  const r=$('#hg-range');r.min=HG.offer;r.max=HG.last;r.step=HG.step;r.value=HG.last;
+  $('#hg-offer').textContent=fmt(HG.offer)+' 萬';$("#hg-take").textContent=`接受 ${fmt(HG.offer)} 萬`;
+  $('#hg-pat').textContent='●'.repeat(Math.max(0,HG.pat))+'○'.repeat(Math.max(0,3-HG.pat));
+  hgShow();$('#haggle').hidden=false;
+}
+function hgShow(){const v=+$('#hg-range').value;$('#hg-mine').textContent=`${fmt(v)} 萬（開價的 ${(v/G.ask*100).toFixed(1)}%）`;}
+$('#hg-range').addEventListener('input',hgShow);
+$('#hg-minus').addEventListener('click',()=>{const r=$('#hg-range');r.value=Math.max(+r.min,+r.value-HG.step);hgShow();Snd.sfx('sel');});
+$('#hg-plus').addEventListener('click',()=>{const r=$('#hg-range');r.value=Math.min(+r.max,+r.value+HG.step);hgShow();Snd.sfx('sel');});
+$('#hg-take').addEventListener('click',()=>{if(!HG)return;Snd.sfx('sel');$('#haggle').hidden=true;hgDeal(HG.offer,'好，那就這個價格成交。');});
+$('#hg-ask').addEventListener('click',()=>{
+  if(!HG)return;const B=BUYERS[G.cur];const X=+$('#hg-range').value;$('#haggle').hidden=true;Snd.sfx('sel');
+  if(X<=HG.max)return hgDeal(X,X>=HG.max-HG.step?'……好吧，這個價格我可以接受。':'好，成交！');
+  const gap=(X-HG.max)/G.ask*100;let line,fx=null;
+  if(gap<=2.5){HG.offer=Math.min(HG.max,HG.offer+Math.round((HG.max-HG.offer)*0.6));HG.pat-=1;line=`再少一點我就簽。我最多加到 ${fmt(HG.offer)} 萬。`;}
+  else if(gap<=6){HG.offer=Math.min(HG.max,HG.offer+Math.round((HG.max-HG.offer)*0.3));HG.pat-=1;line=`還是太高了。我加到 ${fmt(HG.offer)} 萬。`;}
+  else{HG.pat-=2;G.heart=clamp(G.heart-10,0,100);updateBars();floatTxt('down','意願 -10','56%','8%');Snd.sfx('bad');line=B.far;}
+  HG.last=Math.max(HG.offer,X);
+  if(HG.pat<=0){Snd.sfx('lose');return say(B.name+'：','算了，我再看看別間。',()=>{G.leaveWhy='haggle';
+    showTip([['提醒：','買方的耐心有限。喊價太硬，對方會直接走人；喊太快讓步，又會被砍太多。']]);
+    G.picks.push({k:'conseq',tip:'喊價是在猜對方心裡的最高價。喊太硬買方會走，讓太快又虧錢，自售時沒有人幫你探對方的底。'});
+    nextBtn('看結果 ▶',()=>endView(false));});}
+  say(B.name+'：',line,openHaggleUI);
+});
+function hgDeal(X,line){
+  const B=BUYERS[G.cur];G.pct=+(X/G.ask*100).toFixed(1);updateBars();Snd.sfx('win');
+  const left=HG.max-X;
+  say(B.name+'：',line,()=>{
+    showTip([['喊價結果：',`成交 ${fmt(X)} 萬。`],['揭曉：',`他心裡最高其實願意出 ${fmt(HG.max)} 萬，${left>0?`你少拿了 ${fmt(left)} 萬。`:'你剛好喊到他的底線！'}`]]);
+    if(left>0)G.picks.push({k:'mid',tip:'買方的第一口出價永遠不是他的底線。沒人幫你探底，多喊一點或少喊一點，都是幾十萬的差距。'});
+    nextBtn('繼續 ▶',()=>endView(true));});
+}
+function endView(deal){
+  const B=BUYERS[G.cur],id=G.cur;hidePanels();HG=null;$('#haggle').hidden=true;
+  const price=G.ask*G.pct/100;
+  G.cs.extra=deal?`${B.name}出價 ${fmt(price)} 萬`:`${B.name}走了`;
+  if(G.E<=0||G.J<=0){return nextStep();}
   if(deal){
     G.offers[id]={pct:G.pct,price,name:B.name};
     if(id==='wang')G.flags.wangDeal=true;if(id==='lin')G.flags.linDeal=true;if(id==='boss')G.sold={id,pct:G.pct,price,name:B.name};
@@ -1167,10 +1363,35 @@ function endView(){
     drawSprite($('#ov-cv'),SPR[id]);
   }else{
     Snd.sfx('lose');
+    const why={scared:'買方被你嚇跑了。真心想買的人，可能就這樣錯過。',cold:`意願只有 ${G.heart}，對方連價格都不想談，決定再看看別間。`,haggle:'喊價談不攏，對方的耐心用完了。'}[G.leaveWhy]||'對方決定再看看別間。';
     overlay(`<div class="ov-k">BUYER LEFT</div><canvas id="ov-cv" class="px" style="opacity:.6;transform:scaleX(-1)"></canvas><div class="ov-h">${B.name}走了……</div>
-      <p class="ov-p">${G.heart<=0?'買方被你嚇跑了。真心想買的人，可能就這樣錯過。':`意願只到 ${G.heart}，對方決定再看看別間。`}</p>`,'繼續',()=>{G.heart=null;nextStep();});
+      <p class="ov-p">${why}</p>`,'繼續',()=>{G.heart=null;nextStep();});
     drawSprite($('#ov-cv'),SPR[id]);
   }
+}
+
+/* ================== 如果交給 Ryan（快轉對照） ================== */
+let cmpT=null;
+function showCompare(){
+  Snd.play('day');show('scr-compare');const box=$('#scr-compare');box.scrollTop=0;
+  const list=$('#cmp-list');list.innerHTML='';$('#cmp-sum').hidden=true;
+  const btn=$('#cmp-next');btn.textContent='跳過快轉 ▶▶';let i=0;
+  const rows=G.log;
+  const add=r=>{const d=document.createElement('div');d.className='cmp-row';
+    const h=document.createElement('div');h.className='d';h.textContent=`DAY ${r.day}・${r.title}`;
+    const me=document.createElement('div');me.className='me';me.innerHTML='<b>你：</b>';me.append(r.me);
+    const ry=document.createElement('div');ry.className='ry';ry.innerHTML='<b>Ryan：</b>';ry.append(r.ryan);
+    d.append(h,me,ry);list.appendChild(d);box.scrollTop=box.scrollHeight;Snd.sfx('type');};
+  const done=()=>{clearInterval(cmpT);while(i<rows.length)add(rows[i++]);renderCmpSum();$('#cmp-sum').hidden=false;btn.textContent='看 333 售屋專案 ▶';G.cmpDone=true;
+    setTimeout(()=>{$('#cmp-sum').scrollIntoView({block:'start',behavior:RM?'auto':'smooth'});},50);};
+  G.cmpDone=false;clearInterval(cmpT);
+  if(RM||!rows.length)done();else cmpT=setInterval(()=>{if(i>=rows.length)return done();add(rows[i++]);},260);
+  btn.onclick=()=>{Snd.sfx('sel');if(!G.cmpDone)return done();showPromo();};
+}
+function renderCmpSum(){
+  const S=G.stats,loss=G.losses.reduce((a,l)=>a+l.amt,0);
+  const rows=[['剩下的體力',G.E,92],['工作表現',G.J,96],['請假',S.leave+' 天','0.5 天'],['熬夜',S.late+' 次','0 次'],['吵架、糾紛',S.fights+' 次','0 次'],['失誤造成的損失',fmtW(loss)+' 萬','0 萬'],['你親自帶看',S.views+' 組','0 組']];
+  $('#cmp-tbody').innerHTML=rows.map(r=>`<tr><th scope="row">${r[0]}</th><td class="me">${r[1]}</td><td class="ry">${r[2]}</td></tr>`).join('');
 }
 
 /* ================== 結算 ================== */
@@ -1182,7 +1403,7 @@ function finish(reason){
     sold:['交屋完成！','房子終於賣掉了。你看著空蕩蕩的客廳，只想好好睡一覺。']};
   const [h,p]=msgs[reason];
   Snd.sfx(reason==='sold'?'fan':'lose');
-  overlay(`<div class="ov-k">DAY ${G.day} · ${reason==='sold'?'CLEAR':'GAME OVER'}</div><canvas id="ov-cv" class="px"></canvas><div class="ov-h">${h}</div><p class="ov-p">${p}</p>`,'繼續',showPromo);
+  overlay(`<div class="ov-k">DAY ${G.day} · ${reason==='sold'?'CLEAR':'GAME OVER'}</div><canvas id="ov-cv" class="px"></canvas><div class="ov-h">${h}</div><p class="ov-p">${p}</p>`,'繼續',showCompare);
   drawSprite($('#ov-cv'),reason==='sold'?SPR.house:SPR.meTired);
 }
 function showPromo(){Snd.play('title');show('scr-promo');$('#scr-promo').scrollTop=0;drawSprite($('#gift-cv'),SPR.plane);$('#promo-next').focus({preventScroll:true});}
@@ -1210,6 +1431,7 @@ function showResult(){
     h+=statHtml('扣掉糾紛和失誤，實拿約',`<span class="num">${fmt(R.sold.price-R.lossSum)}</span> 萬`,'wide');}
   else h+=statHtml('結果','房子沒賣出去','wide bad');
   h+=statHtml('稅務法規題',`<span class="num">${S.quizOk}/${S.quiz}</span> 答對`,S.quizOk<S.quiz?'bad':'');
+  h+=statHtml('來電判讀',`<span class="num">${S.screenOk}/${S.screen}</span> 看穿`,S.screenOk<S.screen?'bad':'');
   h+=statHtml('踩到的雷',`<span class="num">${S.traps}</span> 個`,S.traps?'bad':'');
   h+=statHtml('請假',`<span class="num">${S.leave}</span> 天`,S.leave>=2?'bad':'');
   h+=statHtml('熬夜',`<span class="num">${S.late}</span> 次`,S.late>=2?'bad':'');
